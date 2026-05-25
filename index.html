@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sofie</title>
+    <link href="https://hangeul.pstatic.net/hangeul_static/css/NanumSquare Neo.css" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'NanumSquare Neo', -apple-system, 'Helvetica Neue', sans-serif;
+            background: #0b0f1a;
+            color: #fff;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ─── BACKGROUND ─── */
+        .bg {
+            position: absolute; inset: 0; z-index: 0;
+            background: #0a0e1a;
+            overflow: hidden;
+        }
+        .bg video {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        .bg video.active { opacity: 0.35; }
+        .bg::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(8,12,24,0.5) 0%, rgba(8,12,24,0.7) 100%);
+        }
+
+        .page { position: relative; z-index: 1; }
+
+        .below-hero {
+            position: relative;
+            background: #0a0e1a;
+        }
+
+        /* ─── HERO (FULL VIEWPORT) ─── */
+        .hero {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center;
+            padding: 0 6vw;
+            position: relative;
+            overflow: hidden;
+            background: #0a0e1a;
+        }
+
+        /* ─── LOGO ─── */
+        .logo {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+        .logo span {
+            font-size: 1.3rem;
+            font-weight: 300;
+            letter-spacing: 0.25em;
+            color: rgba(255,255,255,0.55);
+        }
+
+        /* ─── HERO CONTENT ─── */
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            padding-bottom: 0;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* LEFT */
+        .hero-left {}
+        .hero-left .sub {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 0.03em;
+            margin-bottom: 12px;
+        }
+        .hero-left h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+            margin-bottom: 14px;
+        }
+        .hero-left .desc {
+            font-size: 0.92rem;
+            color: #fff;
+            line-height: 1.7;
+            margin-bottom: 28px;
+            max-width: 380px;
+        }
+        .hero-left .cta {
+            display: inline-block;
+            padding: 10px 28px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            text-decoration: none;
+            background: #fff;
+            border: none;
+            transition: all 0.3s;
+        }
+        .hero-left .cta:hover {
+            background: rgba(255,255,255,0.85);
+            transform: translateY(-1px);
+        }
+
+        /* RIGHT — STATS */
+        .hero-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0;
+        }
+        .stat {
+            text-align: right;
+            padding: 20px 0;
+            width: 240px;
+        }
+        .stat .label {
+            font-size: 0.85rem;
+            color: #fff;
+            margin-bottom: 6px;
+            letter-spacing: 0.01em;
+        }
+        .stat .number {
+            font-size: 4.2rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            color: #fff;
+        }
+        .stat .number small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.35);
+            margin-left: 2px;
+        }
+
+        /* ─── BELOW HERO SECTIONS ─── */
+        .sec {
+            max-width: 1100px; margin: 0 auto;
+            padding: 80px 6vw;
+        }
+        .sec-label {
+            font-size: 0.6rem; text-transform: uppercase;
+            letter-spacing: 0.15em; color: rgba(255,255,255,0.2);
+            margin-bottom: 6px;
+        }
+        .sec-h {
+            font-size: 1.5rem; font-weight: 600; margin-bottom: 2.5rem;
+            color: rgba(255,255,255,0.9);
+        }
+        .sep { max-width: 1100px; margin: 0 auto; padding: 0 6vw; }
+        .sep hr { border: none; height: 1px; background: rgba(255,255,255,0.04); }
+
+        /* ABOUT */
+        .about-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+        .profile-photo {
+            width: 200px; height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+            margin-bottom: 1.2rem;
+        }
+        .about-text p { font-size: 0.85rem; color: rgba(255,255,255,0.42); line-height: 1.85; margin-bottom: 0.7rem; }
+        .about-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .ac { padding: 1.1rem; border-radius: 10px; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.04); transition: all 0.3s; }
+        .ac:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+        .ac .ic { font-size: 1.2rem; margin-bottom: 6px; }
+        .ac h4 { font-size: 0.78rem; font-weight: 600; color: rgba(255,255,255,0.75); margin-bottom: 2px; }
+        .ac p { font-size: 0.68rem; color: rgba(255,255,255,0.28); margin: 0; }
+
+        /* SKILLS — marquee */
+        .marquee-wrap { overflow: hidden; position: relative; padding: 1rem 0; }
+        .marquee-wrap::before, .marquee-wrap::after {
+            content: ''; position: absolute; top: 0; bottom: 0; width: 80px; z-index: 1;
+        }
+        .marquee-wrap::before { left: 0; background: linear-gradient(to right, #0a0e1a, transparent); }
+        .marquee-wrap::after { right: 0; background: linear-gradient(to left, #0a0e1a, transparent); }
+        .marquee-track {
+            display: flex; gap: 14px; width: max-content;
+            animation: marquee 28s linear infinite;
+        }
+        .marquee-track:hover { animation-play-state: paused; }
+        .marquee-reverse { animation: marquee-r 28s linear infinite; }
+        @keyframes marquee-r { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .skt {
+            font-size: 0.88rem; padding: 12px 28px; border-radius: 12px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.55); white-space: nowrap; transition: all 0.2s;
+        }
+        .skt:hover { color: #7eb8ff; background: rgba(100,180,255,0.06); border-color: rgba(100,180,255,0.12); }
+
+        /* CAREER TIMELINE */
+        .tl-layout { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; }
+        .tl-years {
+            display: flex; flex-direction: column; gap: 0;
+        }
+        .tl-yr {
+            padding: 7px 0;
+            font-size: 1.05rem; font-weight: 500; font-family: inherit;
+            background: none; border: none;
+            color: rgba(255,255,255,0.25); cursor: pointer;
+            text-align: left; transition: color 0.2s;
+        }
+        .tl-yr:hover { color: rgba(255,255,255,0.6); }
+
+        .tl-yr[data-year="core"] { --c: 255,255,255; }
+        .tl-yr[data-year="core"] {
+            background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #ff6b6b);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: coreShine 3s linear infinite;
+        }
+        .tl-yr[data-year="core"].active {
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        @keyframes coreShine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+        .tl-panel[data-year="core"] li {
+            border-left: 2px solid rgba(212, 175, 55, 0.4) !important;
+        }
+        .tl-panel[data-year="core"] li::before {
+            background: #d4af37 !important;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+        }
+        .core-title {
+            background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #ff6b6b);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: coreShine 3s linear infinite;
+        }
+        .tl-yr[data-year="2026"] { --c: 100,180,255; }
+        .tl-yr[data-year="2025"] { --c: 130,160,255; }
+        .tl-yr[data-year="2024"] { --c: 160,120,255; }
+        .tl-yr[data-year="2023"] { --c: 190,100,240; }
+        .tl-yr[data-year="2022"] { --c: 220,90,200; }
+        .tl-yr[data-year="2021"] { --c: 240,100,160; }
+        .tl-yr[data-year="2020"] { --c: 255,110,120; }
+        .tl-yr[data-year="2019"] { --c: 255,140,90; }
+        .tl-yr[data-year="2018"] { --c: 255,170,60; }
+        .tl-yr[data-year="2017"] { --c: 255,200,50; }
+        .tl-yr[data-year="2016"] { --c: 200,220,60; }
+        .tl-yr[data-year="2013"] { --c: 160,230,100; }
+
+        .tl-yr.active { color: rgb(var(--c)); font-weight: 700; }
+        .tl-content { position: relative; min-height: 120px; }
+        .tl-panel[data-year="core"] ul {
+            columns: 2;
+            column-gap: 2rem;
+        }
+        .tl-panel {
+            display: none;
+            animation: fadeUp 0.4s ease;
+        }
+        .tl-panel.active { display: block; }
+        .tl-panel h3 { font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 12px; }
+        .tl-panel ul { list-style: none; }
+        .tl-panel li {
+            font-size: 0.85rem; color: rgba(255,255,255,0.5);
+            padding: 6px 0 6px 16px; position: relative;
+            border-left: 2px solid rgba(100,180,255,0.15);
+        }
+        .tl-panel li::before {
+            content: ''; position: absolute; left: -5px; top: 12px;
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--dot, #7eb8ff);
+        }
+        .tl-panel li strong { font-size: 0.95rem; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+        /* PROJECTS — cards */
+        .pj-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .pjc {
+            border-radius: 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        .pjc:hover { border-color: rgba(255,255,255,0.12); transform: translateY(-3px); background: rgba(255,255,255,0.05); }
+        .pjc-img {
+            width: 100%; height: 140px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: block;
+        }
+        .pjc-img-placeholder {
+            width: 100%; height: 140px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.12);
+            font-size: 0.75rem;
+        }
+        .pjc-body { padding: 1.2rem 1.4rem; }
+        .pjc-year { font-size: 0.65rem; font-weight: 600; color: #7eb8ff; margin-bottom: 8px; }
+        .pjc h3 { font-size: 0.92rem; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 4px; }
+        .pjc > p { font-size: 0.75rem; color: rgba(255,255,255,0.35); line-height: 1.6; margin-bottom: 10px; }
+        .pjc-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .pjc-tags span { font-size: 0.63rem; font-weight: 500; padding: 3px 8px; border-radius: 5px; background: rgba(100,180,255,0.07); color: #7eb8ff; }
+
+        .pj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .pjc { border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); transition: all 0.3s; }
+        .pjc:hover { border-color: rgba(255,255,255,0.08); transform: translateY(-2px); }
+        .pj-top { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .pj-bd { padding: 1.1rem 1.3rem; }
+        .pj-bd h3 { font-size: 0.88rem; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 3px; }
+        .pj-bd > p { font-size: 0.73rem; color: rgba(255,255,255,0.35); line-height: 1.6; margin-bottom: 8px; }
+        .pj-ch { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 8px; }
+        .pj-ch span { font-size: 0.62rem; font-weight: 500; padding: 2px 7px; border-radius: 4px; background: rgba(100,180,255,0.07); color: #7eb8ff; }
+        .pj-lk { display: flex; gap: 10px; }
+        .pj-lk a { font-size: 0.72rem; color: rgba(255,255,255,0.28); text-decoration: none; }
+        .pj-lk a:hover { color: #7eb8ff; }
+
+        /* EXP */
+        .exp-list { display: flex; flex-direction: column; gap: 6px; }
+        .exc { padding: 1.3rem 1.5rem; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-left: 2px solid rgba(100,180,255,0.35); }
+        .exc .yr { font-size: 0.68rem; font-weight: 600; color: #7eb8ff; }
+        .exc h3 { font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,0.8); margin: 2px 0; }
+        .exc .co { font-size: 0.75rem; color: rgba(255,255,255,0.25); margin-bottom: 6px; }
+        .exc ul { list-style: none; }
+        .exc li { font-size: 0.75rem; color: rgba(255,255,255,0.35); padding: 2px 0 2px 12px; position: relative; }
+        .exc li::before { content:''; position:absolute; left:0; top:8px; width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.15); }
+
+        /* CONTACT */
+        .ct-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+        .ctl h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+        .ctl > p { font-size: 0.82rem; color: rgba(255,255,255,0.35); line-height: 1.7; margin-bottom: 1.5rem; }
+        .ct-links { display: flex; flex-direction: column; gap: 4px; }
+        .cta2 { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: rgba(255,255,255,0.35); text-decoration: none; padding: 5px 6px; border-radius: 6px; transition: all 0.2s; }
+        .cta2:hover { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.7); }
+        .ct-ic { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); }
+        .ct-form { display: flex; flex-direction: column; gap: 5px; }
+        .ct-form input, .ct-form textarea { padding: 9px 12px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; font-family: inherit; color: rgba(255,255,255,0.75); outline: none; transition: all 0.2s; }
+        .ct-form input::placeholder, .ct-form textarea::placeholder { color: rgba(255,255,255,0.18); }
+        .ct-form input:focus, .ct-form textarea:focus { border-color: rgba(100,180,255,0.25); }
+        .ct-form textarea { min-height: 90px; resize: vertical; }
+        .ct-btn { padding: 9px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); font-size: 0.8rem; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.3s; }
+        .ct-btn:hover { background: rgba(255,255,255,0.1); }
+
+        footer {
+            text-align: center; padding: 50px 2rem 30px;
+        }
+        footer img { height: 24px; opacity: 0.2; margin-bottom: 10px; }
+        footer p { font-size: 0.65rem; color: rgba(255,255,255,0.12); }
+
+        /* ─── SCROLL INDICATOR ─── */
+        .scroll-hint {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            color: rgba(255,255,255,0.25);
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+        .scroll-hint .mouse {
+            width: 20px; height: 32px;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            border-radius: 10px;
+            position: relative;
+        }
+        .scroll-hint .mouse::after {
+            content: '';
+            position: absolute;
+            top: 6px; left: 50%;
+            transform: translateX(-50%);
+            width: 2px; height: 6px;
+            border-radius: 1px;
+            background: rgba(255,255,255,0.4);
+            animation: scrollDot 1.8s ease-in-out infinite;
+        }
+        @keyframes scrollDot {
+            0% { opacity: 1; top: 6px; }
+            50% { opacity: 0.3; top: 16px; }
+            100% { opacity: 1; top: 6px; }
+        }
+
+        .reveal { opacity: 0; transform: translateY(12px); transition: opacity 0.6s, transform 0.6s; }
+        .reveal.v { opacity: 1; transform: none; }
+
+        /* PAGE INDICATOR */
+        .page-ind {
+            position: fixed; right: 28px; top: 50%; transform: translateY(-50%);
+            z-index: 99; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+            opacity: 0; transition: opacity 0.4s;
+        }
+        .page-ind.show { opacity: 1; }
+        .page-ind a {
+            text-decoration: none;
+            font-size: 0.65rem; font-weight: 500;
+            color: rgba(255,255,255,0.1);
+            transition: all 0.35s;
+            line-height: 1;
+        }
+        .page-ind a.near { color: rgba(255,255,255,0.2); font-size: 0.7rem; }
+        .page-ind a.active {
+            color: #fff; font-size: 0.85rem; font-weight: 700;
+        }
+
+        /* ─── TABLET ─── */
+        @media (max-width: 1024px) {
+            .hero { padding: 0 2rem; }
+            .hero-content { max-width: 100%; gap: 2rem; }
+            .stat .number { font-size: 2.6rem; }
+            .stat { width: 200px; }
+            .sec { padding: 60px 2rem; }
+        }
+
+        /* ─── MOBILE ─── */
+        @media (max-width: 768px) {
+            .page-ind { display: none; }
+            .hero { padding: 0 1.5rem; }
+            .hero-content { grid-template-columns: 1fr; gap: 2.5rem; align-items: center; text-align: center; }
+            .logo { top: 24px; }
+            .hero-left h1 { font-size: 1.7rem; }
+            .hero-left .desc { margin-left: auto; margin-right: auto; }
+            .hero-right { align-items: center; }
+            .stat { text-align: center; width: 100%; padding: 14px 0; }
+            .stat .number { font-size: 2.8rem; }
+            .about-cols { grid-template-columns: 1fr; gap: 2rem; }
+            .about-cards { grid-template-columns: 1fr 1fr; }
+            .ct-cols { grid-template-columns: 1fr; gap: 2rem; }
+            .tl-layout { grid-template-columns: 1fr; gap: 1rem; }
+            .tl-panel[data-year="core"] ul { columns: 1; }
+            .pj-cards { grid-template-columns: 1fr; }
+            .tl-years { flex-direction: row; overflow-x: auto; gap: 0; scrollbar-width: none; }
+            .tl-years::-webkit-scrollbar { display: none; }
+            .tl-yr { padding: 8px 14px; white-space: nowrap; }
+            .sec { padding: 50px 1.5rem; }
+            .sep { padding: 0 1.5rem; }
+        }
+
+        /* ─── SMALL MOBILE ─── */
+        @media (max-width: 480px) {
+            .hero { padding: 0 1.2rem; }
+            .hero-left h1 { font-size: 1.4rem; }
+            .hero-left .desc { font-size: 0.72rem; }
+            .stat .number { font-size: 2.2rem; }
+            .about-cards { grid-template-columns: 1fr; }
+            .sec { padding: 40px 1.2rem; }
+            .sec-h { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-ind">
+    <a href="#hero" data-sec="hero" data-idx="0" class="active">Home</a>
+    <a href="#about" data-sec="about" data-idx="1">약력</a>
+    <a href="#skills" data-sec="skills" data-idx="2">기술</a>
+    <a href="#exp" data-sec="exp" data-idx="3">경력</a>
+    <a href="#projects" data-sec="projects" data-idx="4">프로젝트</a>
+</div>
+
+<div class="page">
+
+<!-- HERO — matches screenshot exactly -->
+<section class="hero" id="hero">
+    <div class="bg">
+        <video id="bgA" muted playsinline></video>
+        <video id="bgB" muted playsinline></video>
+    </div>
+    <div class="logo"><img src="소피로고.svg" alt="sofie" style="height: 41px;"></div>
+    <div class="hero-content">
+        <div class="hero-left reveal">
+            <h1>SW 공학자 이주호</h1>
+            <p class="desc">SW로 세상의 문제를 해결하는 꿈</p>
+            <a href="#exp" class="cta">경력 보러 가기 →</a>
+        </div>
+        <div class="hero-right reveal">
+            <div class="stat">
+                <div class="label">경력을 시작한지</div>
+                <div class="number"><span class="count" data-target="13">0</span><small>년</small></div>
+            </div>
+            <div class="stat">
+                <div class="label">프로젝트의 수</div>
+                <div class="number"><span class="count" data-target="42">0</span><small>개</small></div>
+            </div>
+            <div class="stat">
+                <div class="label">코딩 대외활동</div>
+                <div class="number"><span class="count" data-target="54">0</span><small>개</small></div>
+            </div>
+        </div>
+    </div>
+    <div class="scroll-hint">
+        <div class="mouse"></div>
+        scroll
+    </div>
+</section>
+
+<div class="below-hero">
+<div class="sep"><hr></div>
+
+<!-- ABOUT -->
+<section class="sec" id="about">
+    <div class="sec-label reveal">소개</div>
+    <h2 class="sec-h reveal">약력 소개</h2>
+    <div class="about-cols">
+        <div class="about-text reveal" style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+            <img src="스크린샷 2025-09-04 152021.jpg.png" alt="이주호" class="profile-photo">
+            <p style="font-size:1.1rem;font-weight:700;color:rgba(255,255,255,0.7);margin-top:0.8rem;">SW로 기존 개념을 재정의하여 문제를 해결합니다.</p>
+            <p style="margin-top:1.2rem;">안녕하세요, 이주호입니다. 2013년에 앱·웹 개발로 코딩을 시작했고, 서버 개발을 거치면서 자연스럽게 백엔드와 인프라를 맡게 됐습니다. 지금은 경험을 넓혀가면서 팀장으로 프로젝트를 이끌고 있고, SW로 실제 문제를 풀어내는 일을 하고 있습니다.</p>
+            <div style="margin-top:1.2rem;font-size:0.82rem;color:rgba(255,255,255,0.45);line-height:1.8;">
+                &#128222; 010-7463-7310<br>
+                &#9993; juho0601@naver.com
+            </div>
+        </div>
+        <div class="about-text reveal">
+            <table style="width:100%;border-collapse:collapse;">
+                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;width:80px;">이름</td><td style="padding:8px 0;font-size:0.88rem;">이주호</td></tr>
+                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.05);">출생</td><td style="padding:8px 0;font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.05);">2006년</td></tr>
+                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.05);">학력</td><td style="padding:8px 0;font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.05);">現 성균관대학교 소프트웨어학과 25학번 (3.74/4.5)<br>前 선린인터넷고등학교 소프트웨어과 117기 (전교 3등)</td></tr>
+                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.05);">대표경력</td><td style="padding:8px 0;font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.05);line-height:1.8;">現 AI·SW마에스트로 17기 팀장<br>前 삼성SW히어로즈 2018~2019<br>前 선린인터넷고 서버전공동아리 AnA 13기 부장<br>한국정보올림피아드 4회 수상<br>삼성주소창 대회 장려상<br>DDP, 킨텍스 대표 전시 경험<br><a href="https://solved.ac/profile/yangpyeong" target="_blank" style="color:#7eb8ff;text-decoration:none;">백준 다이아5 : yangpyeong ↗</a></td></tr>
+                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.05);">자격증</td><td style="padding:8px 0;font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.05);line-height:1.8;">COS Pro C++ 1급<br>네트워크관리사 1급 / 2급<br>리눅스마스터 2급<br>정보처리기능사</td></tr>
+                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.05);">포지션</td><td style="padding:8px 0;font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.05);">백엔드 · 인프라 · PM · AI/ML</td></tr>
+            </table>
+        </div>
+    </div>
+</section>
+
+<div class="sep"><hr></div>
+
+<!-- SKILLS -->
+<section class="sec" id="skills">
+    <div class="sec-label reveal">기술 역량</div>
+    <h2 class="sec-h reveal">기술 스택</h2>
+    <div class="marquee-wrap reveal">
+        <div class="marquee-track">
+            <span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span><span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span><span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span><span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span><span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span><span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span>
+        </div>
+    </div>
+    <div class="marquee-wrap reveal">
+        <div class="marquee-track marquee-reverse">
+            <span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span><span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span><span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span><span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span><span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span><span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span>
+        </div>
+    </div>
+    <div class="marquee-wrap reveal">
+        <div class="marquee-track">
+            <span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span><span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span><span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span><span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span><span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span><span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span>
+        </div>
+    </div>
+</section>
+
+<div class="sep"><hr></div>
+
+<!-- CAREER TIMELINE -->
+<section class="sec" id="exp">
+    <div class="sec-label reveal">경력</div>
+    <h2 class="sec-h reveal">세부 경력</h2>
+    <div class="tl-layout reveal">
+    <div class="tl-years" id="tlYears">
+        <button class="tl-yr active" data-year="core">핵심경력</button>
+        <button class="tl-yr" data-year="2026">2026</button>
+        <button class="tl-yr" data-year="2025">2025</button>
+        <button class="tl-yr" data-year="2024">2024</button>
+        <button class="tl-yr" data-year="2023">2023</button>
+        <button class="tl-yr" data-year="2022">2022</button>
+        <button class="tl-yr" data-year="2021">2021</button>
+        <button class="tl-yr" data-year="2020">2020</button>
+        <button class="tl-yr" data-year="2019">2019</button>
+        <button class="tl-yr" data-year="2018">2018</button>
+        <button class="tl-yr" data-year="2017">2017</button>
+        <button class="tl-yr" data-year="2016">2016</button>
+        <button class="tl-yr" data-year="2013">2013</button>
+    </div>
+    <div class="tl-content" id="tlContent">
+        <div class="tl-panel active" data-year="core">
+            <h3 class="core-title">핵심경력</h3>
+            <ul>
+                <li><strong style="color:#fff;">AI·SW마에스트로 17기 팀장 : Run-Time</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2026</span></li>
+                <li><strong style="color:#fff;">네트워크관리사 1급 취득</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2026</span></li>
+                <li><strong style="color:#fff;">SK하이닉스 하인슈타인 대학생 멘토</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2026</span></li>
+                <li><strong style="color:#fff;">MS 부산학교로 찾아가는 AI교육 멘토</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2026</span></li>
+                <li><strong style="color:#fff;">성균관대학교 신입생 파이썬 사전교육 : 반도체융합공학과 TA</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2026</span></li>
+                <li><strong style="color:#fff;">성균관대학교 소프트웨어학과 입학</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2025</span></li>
+                <li><strong style="color:#fff;">네이버 부스트캠프 챌린지</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2025</span></li>
+                <li><strong style="color:#fff;">백준 랭크 다이아5 달성 (1500등)</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2025</span></li>
+                <li><strong style="color:#fff;">수원정보과학고등학교 AI기초 대표강사</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2025</span></li>
+                <li><strong style="color:#fff;">COS Pro C++ 1급 취득</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2025</span></li>
+                <li><strong style="color:#fff;">네트워크관리사 2급 취득</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2025</span></li>
+                <li><strong style="color:#fff;">리눅스마스터 2급 취득</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2025</span></li>
+                <li><strong style="color:#fff;">정보처리기능사 취득</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2025</span></li>
+                <li><strong style="color:#fff;">선린인터넷고등학교 소프트웨어과 졸업 (전교 3등)</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2024</span></li>
+                <li><strong style="color:#fff;">선린장학재단 장학생 선발 (금 백만 원정)</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2024</span></li>
+                <li><strong style="color:#fff;">SW교육페스티벌 학교대표 킨텍스 전시 및 설명</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2023</span></li>
+                <li><strong style="color:#fff;">서울진로직업박람회 학교대표 DDP 전시 및 설명</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2023</span></li>
+                <li><strong style="color:#fff;">백준 선린프로그래밍챌린지 출제 및 스태프</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2023</span></li>
+                <li><strong style="color:#fff;">선린인터넷고등학교 신입생 대상 C언어 교육 멘토 및 문제출제</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2023</span></li>
+                <li><strong style="color:#fff;">선린장학재단 장학생 선발 (금 백만 원정)</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2023</span></li>
+                <li><strong style="color:#fff;">2023 소프트웨어나눔축제 강사 및 감독</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2023</span></li>
+                <li><strong style="color:#fff;">선린인터넷고등학교 프로그래밍경시대회 동상</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2022</span></li>
+                <li><strong style="color:#fff;">선린인터넷고 소프트웨어나눔축제 교재제작</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2022</span></li>
+                <li><strong style="color:#fff;">한림장학재단 장학생 선발 (금 백만 원정)</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2022</span></li>
+                <li><strong style="color:#fff;">선린인터넷고 파이썬 여름방학 최우수자</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2021</span></li>
+                <li><strong style="color:#fff;">삼성전자 소프트웨어히어로즈 공앙팀 활동</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2019</span></li>
+                <li><strong style="color:#fff;">삼성전자 소프트웨어히어로즈 정이조팀 히어로즈상</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2018</span></li>
+                <li><strong style="color:#fff;">강원도립대학교 4차산업혁명 코딩캠프 : 초등학생 최연소 멘토</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2018</span></li>
+                <li><strong style="color:#fff;">한국정보올림피아드 공모부문 은상 "빽빽"</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2018</span></li>
+                <li><strong style="color:#fff;">한국정보올림피아드 경시대회 서울예선 은상</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2018</span></li>
+                <li><strong style="color:#fff;">한국정보올림피아드 경시대회 전국본선 동상</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2018</span></li>
+                <li><strong style="color:#fff;">한국정보올림피아드 공모부문 "쪼수" 은상</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2017</span></li>
+                <li><strong style="color:#fff;">삼성전자 주니어소프트웨어창작대회 "할망어디가" 장려상</strong> <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">2017</span></li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2026">
+            <h3>2026</h3>
+            <ul>
+                <li><strong style="color:#fff;">AI·SW마에스트로 17기 팀장 : Run-Time</strong></li>
+                <li>42경산 라피신 준비중</li>
+                <li><strong style="color:#fff;">성균관대학교 신입생 파이썬 사전교육 : 반도체융합공학과 TA</strong></li>
+                <li><strong style="color:#fff;">SK하이닉스 하인슈타인 대학생 멘토</strong></li>
+                <li><strong style="color:#fff;">MS 부산학교로 찾아가는 AI교육 멘토</strong></li>
+                <li><strong style="color:#fff;">네트워크관리사 1급 취득</strong></li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2025">
+            <h3>2025</h3>
+            <ul>
+                <li><strong style="color:#fff;">성균관대학교 소프트웨어학과 입학</strong></li>
+                <li><strong style="color:#fff;">COS Pro C++ 1급 취득</strong></li>
+                <li>ICPC Busan/Seoul Regional 스탭</li>
+                <li><strong style="color:#fff;">네이버 부스트캠프 챌린지</strong></li>
+                <li><strong style="color:#fff;">네트워크관리사 2급 취득</strong></li>
+                <li><strong style="color:#fff;">리눅스마스터 2급 취득</strong></li>
+                <li><strong style="color:#fff;">수원정보과학고등학교 AI기초 대표강사</strong></li>
+                <li><strong style="color:#fff;">정보처리기능사 취득</strong></li>
+                <li><strong style="color:#fff;">백준 랭크 다이아5 달성 (1500등)</strong></li>
+                <li>성균관대학교 NPC동아리 활동</li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2024">
+            <h3>2024</h3>
+            <ul>
+                <li><strong style="color:#fff;">선린인터넷고등학교 소프트웨어과 졸업 (전교 3등)</strong></li>
+                <li>선린인터넷고 3-5 부회장</li>
+                <li><strong style="color:#fff;">선린장학재단 장학생 선발 (금 백만 원정)</strong></li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2023">
+            <h3>2023</h3>
+            <ul>
+                <li>AnA 신입생대상캠프 운영</li>
+                <li><strong style="color:#fff;">SW교육페스티벌 학교대표 킨텍스 전시 및 설명</strong></li>
+                <li><strong style="color:#fff;">서울진로직업박람회 학교대표 DDP 전시 및 설명</strong></li>
+                <li><strong style="color:#fff;">선린인터넷고등학교 신입생 대상 C언어 교육 멘토 및 문제출제</strong></li>
+                <li><strong style="color:#fff;">선린장학재단 장학생 선발 (금 백만 원정)</strong></li>
+                <li>선린인터넷고등학교 AnA 동아리 축제전시 총괄</li>
+                <li><strong style="color:#fff;">백준 선린프로그래밍챌린지 출제 및 스태프</strong></li>
+                <li><strong style="color:#fff;">2023 소프트웨어나눔축제 강사 및 감독</strong></li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2022">
+            <h3>2022</h3>
+            <ul>
+                <li>선린인터넷고등학교 소프트웨어과 입학 (117기)</li>
+                <li>선린인터넷고 서버전공동아리 AnA 가입</li>
+                <li>선린 알고리즘동아리 SHARC 활동</li>
+                <li><strong style="color:#fff;">선린인터넷고등학교 프로그래밍경시대회 동상</strong></li>
+                <li><strong style="color:#fff;">선린인터넷고 소프트웨어나눔축제 교재제작</strong></li>
+                <li>온라인코딩파티 시즌2 수료</li>
+                <li><strong style="color:#fff;">한림장학재단 장학생 선발 (금 백만 원정)</strong></li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2021">
+            <h3>2021</h3>
+            <ul>
+                <li>KG 아이티뱅크 (R프로그래밍, 파이썬 머신러닝) 수료</li>
+                <li><strong style="color:#fff;">선린인터넷고 파이썬 여름방학 최우수자</strong></li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2020">
+            <h3>2020</h3>
+            <ul>
+                <li>한국디지털미디어고등학교 경시대회 본선진출</li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2019">
+            <h3>2019</h3>
+            <ul>
+                <li><strong style="color:#fff;">삼성전자 소프트웨어히어로즈 공앙팀 활동</strong></li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2018">
+            <h3>2018</h3>
+            <ul>
+                <li><strong style="color:#fff;">삼성전자 소프트웨어히어로즈 정이조팀 히어로즈상</strong></li>
+                <li>Korea IT 수료 (안드로이드 스튜디오, Java, C++, JSP, 리눅스)</li>
+                <li><strong style="color:#fff;">강원도립대학교 4차산업혁명 코딩캠프 : 초등학생 최연소 멘토</strong></li>
+                <li><strong style="color:#fff;">한국정보올림피아드 공모부문 은상 "빽빽"</strong></li>
+                <li><strong style="color:#fff;">한국정보올림피아드 경시대회 서울예선 은상</strong></li>
+                <li><strong style="color:#fff;">한국정보올림피아드 경시대회 전국본선 동상</strong></li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2017">
+            <h3>2017</h3>
+            <ul>
+                <li><strong style="color:#fff;">한국정보올림피아드 공모부문 "쪼수" 은상</strong></li>
+                <li><strong style="color:#fff;">삼성전자 주니어소프트웨어창작대회 "할망어디가" 장려상</strong></li>
+                <li>알고리즘 공부 시작</li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2016">
+            <h3>2016</h3>
+            <ul>
+                <li>온라인 코딩파티 시즌2 참가</li>
+                <li>C언어 학습 시작</li>
+                <li>앱인벤터 학습</li>
+            </ul>
+        </div>
+        <div class="tl-panel" data-year="2013">
+            <h3>2013</h3>
+            <ul>
+                <li>스크래치 학습 시작</li>
+                <li>엔트리 학습 시작</li>
+            </ul>
+        </div>
+    </div>
+    </div>
+</section>
+
+<div class="sep"><hr></div>
+
+<!-- PROJECTS -->
+<section class="sec" id="projects">
+    <div class="sec-label reveal">작업물</div>
+    <h2 class="sec-h reveal">프로젝트</h2>
+    <div class="pj-cards reveal">
+        <div class="pjc">
+            <div class="pjc-img-placeholder">&#128247; 이미지 추가</div>
+            <div class="pjc-body">
+                <div class="pjc-year">2026</div>
+                <h3>AI·SW마에스트로 Run-Time</h3>
+                <p>마에스트로 17기 팀 프로젝트 (진행 중)</p>
+                <div class="pjc-tags"><span>Python</span><span>AI/ML</span><span>팀장</span></div>
+            </div>
+        </div>
+        <div class="pjc">
+            <div class="pjc-img-placeholder">&#128247; 이미지 추가</div>
+            <div class="pjc-body">
+                <div class="pjc-year">2025</div>
+                <h3>포트폴리오 사이트</h3>
+                <p>개인 포트폴리오 웹사이트 설계 및 개발</p>
+                <div class="pjc-tags"><span>HTML</span><span>CSS</span><span>JS</span></div>
+            </div>
+        </div>
+        <div class="pjc">
+            <div class="pjc-img-placeholder">&#128247; 이미지 추가</div>
+            <div class="pjc-body">
+                <div class="pjc-year">2023</div>
+                <h3>킨텍스 전시 프로젝트</h3>
+                <p>SW교육페스티벌 학교대표 전시 작품</p>
+                <div class="pjc-tags"><span>서버</span><span>전시</span></div>
+            </div>
+        </div>
+        <div class="pjc">
+            <div class="pjc-img-placeholder">&#128247; 이미지 추가</div>
+            <div class="pjc-body">
+                <div class="pjc-year">2023</div>
+                <h3>DDP 전시 프로젝트</h3>
+                <p>서울진로직업박람회 학교대표 전시 작품</p>
+                <div class="pjc-tags"><span>서버</span><span>전시</span></div>
+            </div>
+        </div>
+        <div class="pjc">
+            <div class="pjc-img-placeholder">&#128247; 이미지 추가</div>
+            <div class="pjc-body">
+                <div class="pjc-year">2019</div>
+                <h3>삼성주소창 대회 출품작</h3>
+                <p>삼성전자 주소창 대회 장려상 수상작</p>
+                <div class="pjc-tags"><span>앱</span><span>삼성</span></div>
+            </div>
+        </div>
+        <div class="pjc">
+            <div class="pjc-img-placeholder">&#128247; 이미지 추가</div>
+            <div class="pjc-body">
+                <div class="pjc-year">2018</div>
+                <h3>빽빽</h3>
+                <p>한국정보올림피아드 공모부문 은상 수상작</p>
+                <div class="pjc-tags"><span>C++</span><span>알고리즘</span></div>
+            </div>
+        </div>
+        <div class="pjc">
+            <div class="pjc-img-placeholder">&#128247; 이미지 추가</div>
+            <div class="pjc-body">
+                <div class="pjc-year">2017</div>
+                <h3>쪼수</h3>
+                <p>한국정보올림피아드 공모부문 은상 수상작</p>
+                <div class="pjc-tags"><span>C</span><span>알고리즘</span></div>
+            </div>
+        </div>
+        <div class="pjc">
+            <div class="pjc-img-placeholder">&#128247; 이미지 추가</div>
+            <div class="pjc-body">
+                <div class="pjc-year">2017</div>
+                <h3>할망어디가</h3>
+                <p>삼성전자 주니어소프트웨어창작대회 장려상 수상작</p>
+                <div class="pjc-tags"><span>앱</span><span>삼성</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<footer>
+    <img src="소피로고.svg" alt="sofie">
+    <p>&copy; 2026 sofie. All rights reserved.</p>
+</footer>
+</div><!-- /below-hero -->
+
+</div>
+
+<script>
+const o=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v')}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(e=>o.observe(e));
+
+document.querySelectorAll('.count').forEach(el=>{
+    const target=+el.dataset.target;
+    const duration=1200;
+    const start=performance.now();
+    function tick(now){
+        const p=Math.min((now-start)/duration,1);
+        const ease=p<0.5?2*p*p:(1-Math.pow(-2*p+2,2)/2);
+        el.textContent=Math.round(ease*target);
+        if(p<1)requestAnimationFrame(tick);
+        else el.textContent=target;
+    }
+    requestAnimationFrame(tick);
+});
+
+const nv=document.getElementById('nav');
+let ly=0;
+window.addEventListener('scroll',()=>{
+    const y=pageYOffset;
+    if(y>ly&&y>60){nv.style.opacity='0';nv.style.pointerEvents='none';nv.style.transform='translateY(-100%)'}
+    else{nv.style.opacity='1';nv.style.pointerEvents='auto';nv.style.transform='translateY(0)'}
+    ly=y;
+});
+
+const clips=['clip1.mp4','clip2.mp4','clip3.mp4','clip4.mp4'];
+let ci=0;
+const va=document.getElementById('bgA');
+const vb=document.getElementById('bgB');
+let current=va, next=vb;
+
+function playNext(){
+    next.src=clips[ci];
+    next.play();
+    next.classList.add('active');
+    current.classList.remove('active');
+    ci=(ci+1)%clips.length;
+    const tmp=current; current=next; next=tmp;
+}
+
+current.addEventListener('ended',playNext);
+next.addEventListener('ended',playNext);
+va.src=clips[ci]; va.play(); va.classList.add('active');
+ci=(ci+1)%clips.length;
+
+const yrC={core:'255,255,255',2026:'100,180,255',2025:'130,160,255',2024:'160,120,255',2023:'190,100,240',2022:'220,90,200',2021:'240,100,160',2020:'255,110,120',2019:'255,140,90',2018:'255,170,60',2017:'255,200,50',2016:'200,220,60',2013:'160,230,100'};
+function applyTlColor(yr){
+    if(yr==='core') return;
+    const c=yrC[yr]||'100,180,255';
+    const p=document.querySelector('.tl-panel.active');
+    if(!p)return;
+    p.querySelector('h3').style.color='rgb('+c+')';
+    p.querySelectorAll('li').forEach(li=>{
+        li.style.borderLeftColor='rgba('+c+',0.2)';
+        li.style.setProperty('--dot','rgb('+c+')');
+    });
+}
+document.querySelectorAll('.tl-yr').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tl-yr').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.tl-panel').forEach(p=>p.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelector('.tl-panel[data-year="'+btn.dataset.year+'"]').classList.add('active');
+        applyTlColor(btn.dataset.year);
+    });
+});
+applyTlColor(2026);
+
+document.querySelectorAll('.pj-yr').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        document.querySelectorAll('.pj-yr').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.pj-panel').forEach(p=>p.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelector('.pj-panel[data-year="'+btn.dataset.year+'"]').classList.add('active');
+        const c=yrC[btn.dataset.year]||'100,180,255';
+        const p=document.querySelector('.pj-panel.active');
+        if(p){
+            p.querySelector('h3').style.color='rgb('+c+')';
+            p.querySelectorAll('li').forEach(li=>{
+                li.style.borderLeftColor='rgba('+c+',0.2)';
+                li.style.setProperty('--dot','rgb('+c+')');
+            });
+        }
+    });
+});
+(function(){
+    const c=yrC[2026];
+    const p=document.querySelector('.pj-panel.active');
+    if(p){
+        p.querySelector('h3').style.color='rgb('+c+')';
+        p.querySelectorAll('li').forEach(li=>{
+            li.style.borderLeftColor='rgba('+c+',0.2)';
+            li.style.setProperty('--dot','rgb('+c+')');
+        });
+    }
+})();
+
+const indLinks=document.querySelectorAll('.page-ind a');
+const sections=['hero','about','skills','exp','projects'];
+const indEl=document.querySelector('.page-ind');
+let hideTimer=null, snapTimer=null;
+window.addEventListener('scroll',()=>{
+    let curIdx=0;
+    sections.forEach((id,i)=>{
+        const el=document.getElementById(id);
+        if(el&&el.getBoundingClientRect().top<=window.innerHeight*0.4) curIdx=i;
+    });
+    indLinks.forEach(a=>{
+        const idx=+a.dataset.idx;
+        const dist=Math.abs(idx-curIdx);
+        a.classList.remove('active','near');
+        if(dist===0) a.classList.add('active');
+        else if(dist===1) a.classList.add('near');
+    });
+    indEl.classList.add('show');
+    clearTimeout(hideTimer);
+    hideTimer=setTimeout(()=>indEl.classList.remove('show'),1500);
+    clearTimeout(snapTimer);
+    snapTimer=setTimeout(()=>{
+        const el=document.getElementById(sections[curIdx]);
+        if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+    },300);
+});
+</script>
+</body>
+</html>

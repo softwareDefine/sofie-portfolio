@@ -1,0 +1,5 @@
+node_modules/
+ffmpeg/
+screenshot-hero.png
+screenshot-full.png
+screenshot.js
