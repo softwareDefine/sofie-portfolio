@@ -25,6 +25,7 @@ app.use(cookieSession({
 
 app.use('/api', api);
 app.get('/admin', requireInternal, (req, res) => res.sendFile(path.join(__dirname, 'views', 'admin.html')));
+app.get('/project/:id(\\d+)', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'project.html')));
 app.use(express.static(PUBLIC_DIR));
 
 // 에러 핸들러

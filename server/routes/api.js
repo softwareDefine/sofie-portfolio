@@ -28,6 +28,15 @@ router.get('/content', async (req, res, next) => {
 // 이하 전부 내부망 전용 (로그인 포함)
 router.use(requireInternal);
 
+// 프로젝트 상세 (공개 — 상세페이지용)
+router.get('/projects/:id(\\d+)', async (req, res, next) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM projects WHERE id = $1', [req.params.id]);
+        if (!rows.length) return res.status(404).json({ error: '없는 프로젝트' });
+        res.json(rows[0]);
+    } catch (e) { next(e); }
+});
+
 // ─── 인증 ───
 router.get('/login-config', loginConfig);
 router.post('/login', login);
@@ -103,14 +112,14 @@ router.delete('/careers/:id', async (req, res, next) => {
 // ─── 프로젝트 CRUD ───
 router.post('/projects', async (req, res, next) => {
     try {
-        const { year, title, description = '', tags = [], image_url = null, link_url = null } = req.body;
+        const { year, title, description = '', tags = [], image_url = null, link_url = null, content = '', images = [] } = req.body;
         if (!Number.isInteger(year) || !title) return res.status(400).json({ error: 'year(정수), title 필수' });
         // 맨 뒤에 추가
         const { rows } = await pool.query(
-            `INSERT INTO projects (year, title, description, tags, image_url, link_url, sort_order)
-             VALUES ($1,$2,$3,$4,$5,$6, (SELECT COALESCE(MAX(sort_order)+1, 0) FROM projects))
+            `INSERT INTO projects (year, title, description, tags, image_url, link_url, content, images, sort_order)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8, (SELECT COALESCE(MAX(sort_order)+1, 0) FROM projects))
              RETURNING *`,
-            [year, title, description, tags, image_url, link_url]
+            [year, title, description, tags, image_url, link_url, content, images]
         );
         res.status(201).json(rows[0]);
     } catch (e) { next(e); }
@@ -118,7 +127,7 @@ router.post('/projects', async (req, res, next) => {
 
 router.put('/projects/:id', async (req, res, next) => {
     try {
-        const { year, title, description, tags, image_url, link_url, sort_order } = req.body;
+        const { year, title, description, tags, image_url, link_url, sort_order, content, images } = req.body;
         const { rows } = await pool.query(
             `UPDATE projects SET
                 year = COALESCE($1, year),
@@ -127,11 +136,13 @@ router.put('/projects/:id', async (req, res, next) => {
                 tags = COALESCE($4, tags),
                 image_url = $5,
                 link_url = $6,
-                sort_order = COALESCE($7, sort_order)
-             WHERE id = $8 RETURNING *`,
+                sort_order = COALESCE($7, sort_order),
+                content = COALESCE($8, content),
+                images = COALESCE($9, images)
+             WHERE id = $10 RETURNING *`,
             [year ?? null, title ?? null, description ?? null, tags ?? null,
              image_url !== undefined ? image_url : null, link_url !== undefined ? link_url : null,
-             sort_order ?? null, req.params.id]
+             sort_order ?? null, content ?? null, images ?? null, req.params.id]
         );
         if (!rows.length) return res.status(404).json({ error: '없는 항목' });
         res.json(rows[0]);

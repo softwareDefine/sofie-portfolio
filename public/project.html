@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sofie</title>
+<link href="https://hangeul.pstatic.net/hangeul_static/css/NanumSquare Neo.css" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{
+    font-family:'NanumSquare Neo',-apple-system,'Helvetica Neue',sans-serif;
+    background:#0a0e1a;color:#fff;-webkit-font-smoothing:antialiased;min-height:100vh;
+}
+a{color:#7eb8ff;text-decoration:none}
+
+.topbar{
+    position:sticky;top:0;z-index:10;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 6vw;
+    background:rgba(10,14,26,.85);backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,.04);
+}
+.back{
+    font-size:.78rem;color:rgba(255,255,255,.45);transition:color .2s;
+}
+.back:hover{color:#fff}
+.topbar img{height:26px}
+.topbar .spacer{width:90px}
+
+.wrap{max-width:840px;margin:0 auto;padding:56px 6vw 80px}
+
+.pj-year{font-size:.72rem;font-weight:700;color:#7eb8ff;letter-spacing:.08em;margin-bottom:10px}
+h1{font-size:2rem;font-weight:800;letter-spacing:-0.02em;line-height:1.25;margin-bottom:14px}
+.pj-desc{font-size:.92rem;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:18px}
+.pj-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}
+.pj-tags span{font-size:.68rem;font-weight:500;padding:4px 11px;border-radius:6px;background:rgba(100,180,255,.08);color:#7eb8ff}
+.pj-links{display:flex;gap:10px;margin-bottom:8px}
+.pj-links a{
+    font-size:.74rem;padding:8px 18px;border-radius:100px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+    color:rgba(255,255,255,.7);transition:all .2s;
+}
+.pj-links a:hover{background:rgba(255,255,255,.1);color:#fff}
+
+.divider{height:1px;background:rgba(255,255,255,.05);margin:34px 0}
+
+/* gallery */
+.gallery{margin-bottom:8px}
+.g-main{
+    width:100%;max-height:480px;object-fit:contain;
+    border-radius:14px;border:1px solid rgba(255,255,255,.06);
+    background:rgba(255,255,255,.02);
+    cursor:zoom-in;
+}
+.g-thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.g-thumbs img{
+    width:84px;height:60px;object-fit:cover;border-radius:8px;
+    border:2px solid transparent;cursor:pointer;opacity:.55;transition:all .2s;
+}
+.g-thumbs img:hover{opacity:.85}
+.g-thumbs img.active{border-color:#7eb8ff;opacity:1}
+
+/* lightbox */
+.lightbox{
+    position:fixed;inset:0;z-index:50;display:none;
+    align-items:center;justify-content:center;
+    background:rgba(0,0,0,.85);backdrop-filter:blur(6px);cursor:zoom-out;
+}
+.lightbox.open{display:flex}
+.lightbox img{max-width:92vw;max-height:90vh;border-radius:10px}
+
+/* markdown */
+.md{font-size:.92rem;line-height:1.85;color:rgba(255,255,255,.6)}
+.md h1,.md h2,.md h3,.md h4{color:rgba(255,255,255,.92);font-weight:700;margin:1.8em 0 .6em;line-height:1.4}
+.md h1{font-size:1.45rem}
+.md h2{font-size:1.2rem;padding-bottom:.4em;border-bottom:1px solid rgba(255,255,255,.06)}
+.md h3{font-size:1.02rem}
+.md p{margin:.8em 0}
+.md ul,.md ol{margin:.8em 0;padding-left:1.5em}
+.md li{margin:.3em 0}
+.md strong{color:rgba(255,255,255,.85)}
+.md a{text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(126,184,255,.35)}
+.md code{
+    font-family:Consolas,'SF Mono',monospace;font-size:.84em;
+    padding:2px 7px;border-radius:5px;background:rgba(255,255,255,.07);color:#ffd93d;
+}
+.md pre{
+    margin:1em 0;padding:16px 18px;border-radius:10px;overflow-x:auto;
+    background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.05);
+}
+.md pre code{padding:0;background:none;color:rgba(255,255,255,.75)}
+.md blockquote{
+    margin:1em 0;padding:.2em 1.2em;
+    border-left:3px solid rgba(100,180,255,.4);color:rgba(255,255,255,.45);
+}
+.md img{max-width:100%;border-radius:10px;border:1px solid rgba(255,255,255,.06);margin:.6em 0}
+.md hr{border:none;height:1px;background:rgba(255,255,255,.07);margin:2em 0}
+.md table{border-collapse:collapse;margin:1em 0;width:100%}
+.md th,.md td{padding:8px 12px;border:1px solid rgba(255,255,255,.08);font-size:.85rem}
+.md th{background:rgba(255,255,255,.04);color:rgba(255,255,255,.8)}
+
+.empty{color:rgba(255,255,255,.25);font-size:.85rem;text-align:center;padding:40px 0}
+.err{text-align:center;padding:120px 20px}
+.err h2{font-size:1.2rem;margin-bottom:10px}
+.err p{color:rgba(255,255,255,.35);font-size:.85rem}
+
+footer{text-align:center;padding:40px 0 30px}
+footer img{height:22px;opacity:.2}
+
+@media(max-width:600px){
+    h1{font-size:1.45rem}
+    .wrap{padding:36px 1.4rem 60px}
+    .topbar{padding:14px 1.4rem}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <a class="back" href="/#projects">← 프로젝트 목록</a>
+    <a href="/"><img src="/소피로고.svg" alt="sofie"></a>
+    <div class="spacer"></div>
+</div>
+
+<div class="wrap" id="content" style="display:none">
+    <div class="pj-year" id="pYear"></div>
+    <h1 id="pTitle"></h1>
+    <p class="pj-desc" id="pDesc"></p>
+    <div class="pj-tags" id="pTags"></div>
+    <div class="pj-links" id="pLinks"></div>
+
+    <div class="divider"></div>
+
+    <div class="gallery" id="gallery" style="display:none">
+        <img class="g-main" id="gMain" alt="">
+        <div class="g-thumbs" id="gThumbs"></div>
+    </div>
+
+    <div class="md" id="pContent"></div>
+</div>
+
+<div class="err" id="notFound" style="display:none">
+    <h2>프로젝트를 찾을 수 없습니다</h2>
+    <p><a href="/#projects">← 목록으로 돌아가기</a></p>
+</div>
+
+<div class="lightbox" id="lightbox"><img id="lbImg" alt=""></div>
+
+<footer><a href="/"><img src="/소피로고.svg" alt="sofie"></a></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.5/dist/purify.min.js"></script>
+<script>
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+(async()=>{
+    const id=location.pathname.split('/').pop();
+    let p;
+    try{
+        const res=await fetch('/api/projects/'+id);
+        if(!res.ok)throw new Error();
+        p=await res.json();
+    }catch(e){
+        document.getElementById('notFound').style.display='block';
+        return;
+    }
+
+    document.title=p.title+' — sofie';
+    document.getElementById('pYear').textContent=p.year;
+    document.getElementById('pTitle').textContent=p.title;
+    document.getElementById('pDesc').textContent=p.description||'';
+    document.getElementById('pTags').innerHTML=(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
+    if(p.link_url){
+        document.getElementById('pLinks').innerHTML='<a href="'+esc(p.link_url)+'" target="_blank" rel="noopener">프로젝트 링크 ↗</a>';
+    }
+
+    // 갤러리: images[] 우선, 없으면 썸네일 한 장이라도
+    const imgs=(p.images&&p.images.length)?p.images:(p.image_url?[p.image_url]:[]);
+    if(imgs.length){
+        const g=document.getElementById('gallery');
+        const main=document.getElementById('gMain');
+        g.style.display='block';
+        main.src=imgs[0];
+        if(imgs.length>1){
+            const thumbs=document.getElementById('gThumbs');
+            thumbs.innerHTML=imgs.map((u,i)=>'<img src="'+esc(u)+'" data-i="'+i+'" class="'+(i===0?'active':'')+'">').join('');
+            thumbs.querySelectorAll('img').forEach(t=>t.onclick=()=>{
+                main.src=imgs[+t.dataset.i];
+                thumbs.querySelectorAll('img').forEach(x=>x.classList.remove('active'));
+                t.classList.add('active');
+            });
+        }
+        // lightbox
+        const lb=document.getElementById('lightbox');
+        main.onclick=()=>{document.getElementById('lbImg').src=main.src;lb.classList.add('open');};
+        lb.onclick=()=>lb.classList.remove('open');
+        document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('open');});
+    }
+
+    // 마크다운 본문
+    const md=(p.content||'').trim();
+    if(md){
+        document.getElementById('pContent').innerHTML=DOMPurify.sanitize(marked.parse(md));
+    }else{
+        document.getElementById('pContent').innerHTML='<p class="empty">아직 작성된 내용이 없습니다.</p>';
+    }
+
+    document.getElementById('content').style.display='block';
+})();
+</script>
+</body>
+</html>
