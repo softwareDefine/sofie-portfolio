@@ -20,6 +20,10 @@ jobs:
           cd /Users/juholee/servers/sofie-portfolio
           docker compose up -d --build
 
+      - name: Reload nginx config
+        run: |
+          docker exec sofie-nginx nginx -t && docker exec sofie-nginx nginx -s reload
+
       - name: Health check
         run: |
           cd /Users/juholee/servers/sofie-portfolio
