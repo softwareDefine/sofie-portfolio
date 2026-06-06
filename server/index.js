@@ -3,7 +3,7 @@ const cookieSession = require('cookie-session');
 const path = require('path');
 const crypto = require('crypto');
 const { migrate } = require('./db');
-const { requireInternal } = require('./auth');
+const { requireInternal, ensureCredentials } = require('./auth');
 const api = require('./routes/api');
 
 const app = express();
@@ -38,6 +38,7 @@ app.use((err, req, res, next) => {
     for (let i = 0; i < 10; i++) {
         try {
             await migrate();
+            await ensureCredentials();
             break;
         } catch (e) {
             if (i === 9) { console.error('DB 연결 실패:', e.message); process.exit(1); }

@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const { pool } = require('../db');
-const { login, logout, loginConfig, requireAdmin, requireInternal } = require('../auth');
+const { login, logout, loginConfig, requireAdmin, requireInternal, resetRequest, resetConfirm } = require('../auth');
 
 const router = express.Router();
 
@@ -14,7 +14,8 @@ router.get('/content', async (req, res, next) => {
         const [careers, projects, settings] = await Promise.all([
             pool.query('SELECT * FROM careers ORDER BY year DESC, sort_order, id'),
             pool.query('SELECT * FROM projects ORDER BY sort_order, id'),
-            pool.query('SELECT key, value FROM settings'),
+            // stat_* 만 공개 (자격증명 등 내부 설정 노출 금지)
+            pool.query(`SELECT key, value FROM settings WHERE key LIKE 'stat\\_%'`),
         ]);
         res.json({
             careers: careers.rows,
@@ -31,6 +32,10 @@ router.use(requireInternal);
 router.get('/login-config', loginConfig);
 router.post('/login', login);
 router.post('/logout', logout);
+
+// ─── 비밀번호·OTP 재설정 (메일 인증) ───
+router.post('/reset/request', resetRequest);
+router.post('/reset/confirm', resetConfirm);
 router.get('/me', (req, res) => res.json({ admin: !!(req.session && req.session.admin) }));
 
 // 이하 전부 admin 전용
@@ -144,7 +149,8 @@ router.delete('/projects/:id', async (req, res, next) => {
 // ─── 스탯 (settings) ───
 router.put('/settings', async (req, res, next) => {
     try {
-        const entries = Object.entries(req.body || {});
+        // stat_* 키만 수정 허용 (자격증명 덮어쓰기 방지)
+        const entries = Object.entries(req.body || {}).filter(([k]) => k.startsWith('stat_'));
         for (const [key, value] of entries) {
             await pool.query(
                 `INSERT INTO settings (key, value) VALUES ($1,$2)

@@ -14,8 +14,31 @@ h1{font-size:1.4rem;font-weight:700;margin-bottom:4px}
 .sub{font-size:.75rem;color:rgba(255,255,255,.3);margin-bottom:28px}
 
 /* login */
-.login-box{max-width:340px;margin:18vh auto 0;display:flex;flex-direction:column;gap:10px}
-.login-box img{height:36px;margin:0 auto 18px;display:block}
+#loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+#loginView.hidden{display:none}
+#loginView::before{
+    content:'';position:absolute;width:560px;height:560px;border-radius:50%;
+    background:radial-gradient(circle, rgba(100,180,255,.07) 0%, transparent 65%);
+    pointer-events:none;
+}
+.login-box{
+    position:relative;width:100%;max-width:340px;margin:0 20px;
+    display:flex;flex-direction:column;gap:10px;
+    animation:loginUp .5s ease;
+}
+@keyframes loginUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.login-box img{height:34px;margin:0 auto 4px;display:block}
+.login-sub{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:center;margin-bottom:22px}
+.login-box input{padding:12px 14px;border-radius:10px;background:rgba(255,255,255,.035)}
+.login-box input:focus{border-color:rgba(100,180,255,.45);box-shadow:0 0 0 3px rgba(100,180,255,.08)}
+.login-box .btn-pri{padding:12px;border-radius:10px;margin-top:4px;font-size:.85rem}
+.login-reset{
+    margin-top:14px;text-align:center;font-size:.7rem;
+    color:rgba(255,255,255,.28);background:none;border:none;padding:4px;
+    text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,.12);
+    transition:color .2s;
+}
+.login-reset:hover{color:rgba(255,255,255,.6)}
 
 /* common controls */
 input,select,textarea,button{font-family:inherit;font-size:.82rem;color:#fff;outline:none}
@@ -82,10 +105,12 @@ button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight
 <div id="loginView" class="hidden">
     <div class="login-box">
         <img src="소피로고.svg" alt="sofie">
+        <div class="login-sub">Admin Console</div>
         <input type="password" id="pw" placeholder="비밀번호" autocomplete="current-password">
         <input type="text" id="otp" placeholder="OTP 6자리" inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code" class="hidden" style="text-align:center;letter-spacing:.4em">
         <button class="btn-pri" id="loginBtn">로그인</button>
         <p id="loginErr" style="font-size:.72rem;color:#ff7b7b;text-align:center"></p>
+        <button class="login-reset" onclick="openResetModal()">비밀번호 · OTP를 잊으셨나요?</button>
     </div>
 </div>
 
@@ -166,6 +191,47 @@ button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight
     </div>
 </div>
 
+<!-- RESET MODAL -->
+<div class="modal-bg" id="resetModal">
+    <div class="modal">
+        <h2>비밀번호 · OTP 재설정</h2>
+
+        <div id="resetStep1">
+            <p style="font-size:.78rem;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:16px">
+                등록된 이메일로 6자리 인증코드를 보냅니다.<br>코드는 10분 동안 유효합니다.
+            </p>
+            <div class="actions">
+                <button class="btn-ghost" onclick="closeModal('resetModal')">취소</button>
+                <button class="btn-pri" id="resetSendBtn">인증코드 발송</button>
+            </div>
+        </div>
+
+        <div id="resetStep2" class="hidden">
+            <p id="resetSentTo" style="font-size:.72rem;color:#7eb8ff;margin-bottom:14px"></p>
+            <div class="field"><label>인증코드 6자리</label><input type="text" id="r_code" inputmode="numeric" maxlength="6" style="text-align:center;letter-spacing:.4em"></div>
+            <div class="field"><label>새 비밀번호 (바꾸려면 입력, 8자 이상)</label><input type="password" id="r_pw" autocomplete="new-password"></div>
+            <div class="field"><div class="inline"><input type="checkbox" id="r_regenOtp"><label for="r_regenOtp" style="margin:0;cursor:pointer">OTP 재발급 (새 키 생성)</label></div></div>
+            <div class="actions">
+                <button class="btn-ghost" onclick="closeModal('resetModal')">취소</button>
+                <button class="btn-pri" id="resetConfirmBtn">재설정</button>
+            </div>
+        </div>
+
+        <div id="resetStep3" class="hidden">
+            <p style="font-size:.85rem;color:#6bcb77;margin-bottom:12px">✓ 재설정 완료</p>
+            <div id="resetOtpResult" class="hidden">
+                <p style="font-size:.74rem;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:8px">
+                    새 OTP 키 — Google Authenticator에서 기존 sofie-admin 삭제 후 아래 키로 다시 등록해:
+                </p>
+                <code id="resetOtpSecret" style="display:block;padding:10px;border-radius:8px;background:rgba(255,255,255,.05);font-size:.78rem;word-break:break-all;margin-bottom:14px;color:#ffd93d"></code>
+            </div>
+            <div class="actions">
+                <button class="btn-pri" onclick="closeModal('resetModal')">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -176,9 +242,12 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 
 async function api(path,opts={}){
     const res=await fetch('/api'+path,{headers:{'Content-Type':'application/json'},...opts});
-    if(res.status===401){showLogin();throw new Error('unauthorized');}
     const data=await res.json().catch(()=>({}));
-    if(!res.ok)throw new Error(data.error||('HTTP '+res.status));
+    if(!res.ok){
+        // 세션 만료 시 로그인 화면으로 (로그인 시도 자체의 401은 제외)
+        if(res.status===401&&path!=='/login')showLogin();
+        throw new Error(data.error||('HTTP '+res.status));
+    }
     return data;
 }
 
@@ -381,6 +450,45 @@ async function saveStats(){
     ['stat_years','stat_projects','stat_activities'].forEach(k=>body[k]=document.getElementById(k).value);
     try{await api('/settings',{method:'PUT',body:JSON.stringify(body)});toast('저장됨');}catch(e){toast(e.message);}
 }
+
+/* ─── reset (메일 인증) ─── */
+function openResetModal(){
+    document.getElementById('resetStep1').classList.remove('hidden');
+    document.getElementById('resetStep2').classList.add('hidden');
+    document.getElementById('resetStep3').classList.add('hidden');
+    document.getElementById('r_code').value='';
+    document.getElementById('r_pw').value='';
+    document.getElementById('r_regenOtp').checked=false;
+    document.getElementById('resetModal').classList.add('open');
+}
+document.getElementById('resetSendBtn').onclick=async()=>{
+    try{
+        const r=await api('/reset/request',{method:'POST'});
+        document.getElementById('resetSentTo').textContent='발송됨 → '+r.sentTo;
+        document.getElementById('resetStep1').classList.add('hidden');
+        document.getElementById('resetStep2').classList.remove('hidden');
+    }catch(e){toast(e.message);}
+};
+document.getElementById('resetConfirmBtn').onclick=async()=>{
+    const code=document.getElementById('r_code').value.trim();
+    const newPassword=document.getElementById('r_pw').value;
+    const regenOtp=document.getElementById('r_regenOtp').checked;
+    if(!/^\d{6}$/.test(code))return toast('인증코드 6자리를 입력해');
+    if(!newPassword&&!regenOtp)return toast('새 비밀번호 입력 또는 OTP 재발급 중 하나는 선택해야 해');
+    try{
+        const r=await api('/reset/confirm',{method:'POST',body:JSON.stringify({code,newPassword:newPassword||undefined,regenOtp})});
+        document.getElementById('resetStep2').classList.add('hidden');
+        document.getElementById('resetStep3').classList.remove('hidden');
+        if(r.otpSecret){
+            document.getElementById('resetOtpResult').classList.remove('hidden');
+            document.getElementById('resetOtpSecret').textContent=r.otpSecret;
+        }
+        // OTP 입력칸 표시 갱신
+        fetch('/api/login-config').then(x=>x.json()).then(c=>{
+            document.getElementById('otp').classList.toggle('hidden',!c.otpRequired);
+        }).catch(()=>{});
+    }catch(e){toast(e.message);}
+};
 
 /* ─── modal helpers ─── */
 function closeModal(id){document.getElementById(id).classList.remove('open');}
