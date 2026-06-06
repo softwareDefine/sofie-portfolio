@@ -6,7 +6,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      # 디렉토리 마운트 — git reset이 파일을 교체해도 컨테이너에 반영됨 (파일 마운트는 inode 고정 함정)
+      - ./nginx:/etc/nginx/conf.d:ro
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     depends_on:
