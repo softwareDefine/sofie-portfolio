@@ -1,15 +1,45 @@
 services:
+  nginx:
+    image: nginx:alpine
+    container_name: sofie-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot
+    container_name: sofie-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+
   app:
     build: .
     container_name: sofie-portfolio
     restart: unless-stopped
     ports:
+      # LAN 직접 접근용 (admin 내부망 접속 + 헬스체크)
       - "${PORT:-8080}:3000"
     environment:
       # 외부 DB 쓰려면 .env에서 DATABASE_URL만 바꾸면 됨
       DATABASE_URL: ${DATABASE_URL:-postgres://sofie:sofie@db:5432/sofie_portfolio}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme}
       SESSION_SECRET: ${SESSION_SECRET:-}
+      OTP_SECRET: ${OTP_SECRET:-}
+      TRUST_PROXY: ${TRUST_PROXY:-1}
+      RESET_EMAIL: ${RESET_EMAIL:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     volumes:
       - uploads:/app/public/uploads
     depends_on:
