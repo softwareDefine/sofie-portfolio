@@ -70,17 +70,17 @@ SELECT * FROM (VALUES
 ) AS v(year, title, featured, sort_order)
 WHERE NOT EXISTS (SELECT 1 FROM careers);
 
-INSERT INTO projects (year, title, description, tags, field, purpose, award, sort_order)
+INSERT INTO projects (year, title, description, tags, field, purpose, award, featured, sort_order)
 SELECT * FROM (VALUES
-    (2026, 'AI·SW마에스트로 Run-Time',  '마에스트로 17기 팀 프로젝트 (진행 중)',          ARRAY['Python','AI/ML','팀장'], 'AI/ML',    '팀 프로젝트', '',       0),
-    (2025, '포트폴리오 사이트',          '개인 포트폴리오 웹사이트 설계 및 개발',           ARRAY['HTML','CSS','JS'],       '웹',       '개인',        '',       1),
-    (2023, '킨텍스 전시 프로젝트',       'SW교육페스티벌 학교대표 전시 작품',               ARRAY['서버','전시'],           '서버',     '전시',        '',       2),
-    (2023, 'DDP 전시 프로젝트',          '서울진로직업박람회 학교대표 전시 작품',           ARRAY['서버','전시'],           '서버',     '전시',        '',       3),
-    (2019, '삼성주소창 대회 출품작',     '삼성전자 주소창 대회 장려상 수상작',              ARRAY['앱','삼성'],             '앱',       '대회',        '장려상', 4),
-    (2018, '빽빽',                       '한국정보올림피아드 공모부문 은상 수상작',         ARRAY['C++','알고리즘'],        '앱',       '대회',        '은상',   5),
-    (2017, '쪼수',                       '한국정보올림피아드 공모부문 은상 수상작',         ARRAY['C','알고리즘'],          '앱',       '대회',        '은상',   6),
-    (2017, '할망어디가',                 '삼성전자 주니어소프트웨어창작대회 장려상 수상작', ARRAY['앱','삼성'],             '앱',       '대회',        '장려상', 7)
-) AS v(year, title, description, tags, field, purpose, award, sort_order)
+    (2026, 'AI·SW마에스트로 Run-Time',  '마에스트로 17기 팀 프로젝트 (진행 중)',          ARRAY['Python','AI/ML','팀장'], 'AI/ML',    '팀 프로젝트', '',       true, 0),
+    (2025, '포트폴리오 사이트',          '개인 포트폴리오 웹사이트 설계 및 개발',           ARRAY['HTML','CSS','JS'],       '웹',       '개인',        '',       true, 1),
+    (2023, '킨텍스 전시 프로젝트',       'SW교육페스티벌 학교대표 전시 작품',               ARRAY['서버','전시'],           '서버',     '전시',        '',       true, 2),
+    (2023, 'DDP 전시 프로젝트',          '서울진로직업박람회 학교대표 전시 작품',           ARRAY['서버','전시'],           '서버',     '전시',        '',       true, 3),
+    (2019, '삼성주소창 대회 출품작',     '삼성전자 주소창 대회 장려상 수상작',              ARRAY['앱','삼성'],             '앱',       '대회',        '장려상', true, 4),
+    (2018, '빽빽',                       '한국정보올림피아드 공모부문 은상 수상작',         ARRAY['C++','알고리즘'],        '앱',       '대회',        '은상',   true, 5),
+    (2017, '쪼수',                       '한국정보올림피아드 공모부문 은상 수상작',         ARRAY['C','알고리즘'],          '앱',       '대회',        '은상',   true, 6),
+    (2017, '할망어디가',                 '삼성전자 주니어소프트웨어창작대회 장려상 수상작', ARRAY['앱','삼성'],             '앱',       '대회',        '장려상', true, 7)
+) AS v(year, title, description, tags, field, purpose, award, featured, sort_order)
 WHERE NOT EXISTS (SELECT 1 FROM projects);
 
 INSERT INTO settings (key, value)
