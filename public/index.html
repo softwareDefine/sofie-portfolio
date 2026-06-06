@@ -1142,6 +1142,8 @@ let videoStarted=false;
 function startVideos(clips){
     if(videoStarted||!clips.length)return;
     videoStarted=true;
+    // 절대경로 정규화 — 팝업으로 URL이 /project/N일 때 상대경로가 깨지는 버그 방지
+    clips=clips.map(c=>/^(https?:)?\//.test(c)?c:'/'+c);
     let ci=0;
     const va=document.getElementById('bgA');
     const vb=document.getElementById('bgB');
