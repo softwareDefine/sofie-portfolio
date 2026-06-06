@@ -223,6 +223,14 @@ button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight
         <div class="field"><label>제목</label><input type="text" id="p_title"></div>
         <div class="field"><label>설명</label><textarea id="p_desc" rows="2"></textarea></div>
         <div class="field"><label>태그 (쉼표로 구분)</label><input type="text" id="p_tags" placeholder="Python, AI/ML, 팀장"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div class="field"><label>분야</label><input type="text" id="p_field" list="fieldList" placeholder="서버, 앱..."></div>
+            <div class="field"><label>목적</label><input type="text" id="p_purpose" list="purposeList" placeholder="대회, 전시..."></div>
+            <div class="field"><label>수상 (수상작만)</label><input type="text" id="p_award" placeholder="은상, 장려상..."></div>
+        </div>
+        <datalist id="fieldList"></datalist>
+        <datalist id="purposeList"></datalist>
+        <div class="field"><div class="inline"><input type="checkbox" id="p_featured"><label for="p_featured" style="margin:0;cursor:pointer">대표 프로젝트 (메인에 기본 노출 ★)</label></div></div>
         <div class="field"><label>링크 URL (선택)</label><input type="text" id="p_link" placeholder="https://..."></div>
         <div class="field">
             <label>썸네일 이미지 (카드에 표시)</label>
@@ -433,6 +441,7 @@ function renderProjects(){
         +'<div class="grow"><div class="title">['+p.year+'] '+esc(p.title)+'</div>'
         +'<div class="meta">'+esc(p.description)+'</div>'
         +'<div class="tags" style="margin-top:4px">'+(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div></div>'
+        +(p.featured?'<span class="badge">대표</span>':'')
         +'<button class="btn-ghost btn-sm" onclick="openProjectModal('+p.id+')">수정</button>'
         +'<button class="btn-danger btn-sm" onclick="delProject('+p.id+')">삭제</button>'
         +'</div>'
@@ -461,6 +470,13 @@ function openProjectModal(id){
     document.getElementById('p_tags').value=editingProject?(editingProject.tags||[]).join(', '):'';
     document.getElementById('p_link').value=editingProject?(editingProject.link_url||''):'';
     document.getElementById('p_content').value=editingProject?(editingProject.content||''):'';
+    document.getElementById('p_featured').checked=editingProject?!!editingProject.featured:false;
+    document.getElementById('p_field').value=editingProject?(editingProject.field||''):'';
+    document.getElementById('p_purpose').value=editingProject?(editingProject.purpose||''):'';
+    document.getElementById('p_award').value=editingProject?(editingProject.award||''):'';
+    // 기존 값으로 자동완성 목록 구성
+    document.getElementById('fieldList').innerHTML=[...new Set(projects.map(p=>p.field).filter(Boolean))].map(v=>'<option value="'+esc(v)+'">').join('');
+    document.getElementById('purposeList').innerHTML=[...new Set(projects.map(p=>p.purpose).filter(Boolean))].map(v=>'<option value="'+esc(v)+'">').join('');
     document.getElementById('p_image').value='';
     document.getElementById('p_gallery').value='';
     renderGalleryList();
@@ -534,6 +550,10 @@ document.getElementById('projectSaveBtn').onclick=async()=>{
         link_url:document.getElementById('p_link').value.trim()||null,
         content:document.getElementById('p_content').value,
         images:galleryImages,
+        featured:document.getElementById('p_featured').checked,
+        field:document.getElementById('p_field').value.trim(),
+        purpose:document.getElementById('p_purpose').value.trim(),
+        award:document.getElementById('p_award').value.trim(),
         image_url,
     };
     if(!body.title||isNaN(body.year))return toast('연도와 제목을 입력해');

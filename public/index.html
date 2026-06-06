@@ -295,8 +295,36 @@
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
         /* PROJECTS — cards */
+        .pj-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+        .pj-filter {
+            font-family: inherit; font-size: 0.72rem; padding: 7px 16px; border-radius: 100px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.45); cursor: pointer; transition: all 0.2s;
+        }
+        .pj-filter:hover { color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.14); }
+        .pj-filter.active { background: #fff; color: #111; font-weight: 700; border-color: #fff; }
+        .pj-filter .caret { display: inline-block; font-size: 0.85rem; opacity: 0.65; margin-left: 2px; vertical-align: -1px; transition: transform 0.25s; }
+        .pj-filter .caret.up { transform: rotate(180deg); }
+        .pj-subfilters {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin: -8px 0 20px; padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            animation: fadeUp 0.25s ease;
+        }
+        .pjc-award { font-size: 0.63rem; font-weight: 600; padding: 3px 8px; border-radius: 5px; background: rgba(255,217,61,0.1); color: #ffd93d; }
         .pj-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         a.pjc { display: block; color: inherit; text-decoration: none; cursor: pointer; }
+        .pjc-year.featured { color: #ffd93d; }
+        .pj-more { text-align: center; margin-top: 22px; }
+        .pj-more button {
+            font-family: inherit; font-size: 0.75rem; font-weight: 600; padding: 10px 26px;
+            border-radius: 100px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09); color: rgba(255,255,255,0.6);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .pj-more button:hover { background: rgba(255,255,255,0.1); color: #fff; }
         .pjc {
             border-radius: 14px;
             background: rgba(255,255,255,0.03);
@@ -648,7 +676,10 @@
 <section class="sec" id="projects">
     <div class="sec-label reveal">작업물</div>
     <h2 class="sec-h reveal">프로젝트</h2>
+    <div class="pj-filters reveal" id="pjFilters"></div>
+    <div class="pj-subfilters" id="pjSubFilters" style="display:none"></div>
     <div class="pj-cards reveal" id="pjCards"></div>
+    <div class="pj-more reveal" id="pjMore" style="display:none"><button id="pjMoreBtn"></button></div>
 </section>
 
 
@@ -767,14 +798,76 @@ function renderTimeline(careers){
     });
 }
 
+let allProjects=[];
+const pjState={kind:'all',value:null,showAll:false}; // kind: all|featured|award|field|purpose
 function renderProjects(projects){
+    if(projects)allProjects=projects;
+    const list=allProjects;
+
+    // 필터 칩: 기본(전체/대표/수상) + 분야/목적은 누르면 아래로 펼쳐짐
+    const groups={field:[...new Set(list.map(p=>p.field).filter(Boolean))],
+                  purpose:[...new Set(list.map(p=>p.purpose).filter(Boolean))]};
+    const groupLabel={field:'분야',purpose:'목적'};
+    const chip=(kind,value,label)=>{
+        const active=pjState.kind===kind&&pjState.value===value;
+        return '<button class="pj-filter'+(active?' active':'')+'" data-kind="'+kind+'" data-value="'+esc(value||'')+'">'+label+'</button>';
+    };
+    let html=chip('all',null,'전체')+chip('featured',null,'★ 대표')+chip('award',null,'&#127942; 수상');
+    for(const g of ['field','purpose']){
+        if(!groups[g].length)continue;
+        const selected=pjState.kind===g?pjState.value:null;
+        const open=pjState.openGroup===g;
+        html+='<button class="pj-filter pj-group'+(selected?' active':'')+'" data-group="'+g+'">'
+            +groupLabel[g]+(selected?': '+esc(selected):'')
+            +' <span class="caret'+(open?' up':'')+'">▾</span></button>';
+    }
+    document.getElementById('pjFilters').innerHTML=html;
+
+    // 펼쳐진 그룹의 세부 칩
+    const sub=document.getElementById('pjSubFilters');
+    if(pjState.openGroup&&groups[pjState.openGroup].length){
+        sub.style.display='flex';
+        sub.innerHTML=groups[pjState.openGroup].map(v=>chip(pjState.openGroup,v,esc(v))).join('');
+    }else{
+        sub.style.display='none';
+        sub.innerHTML='';
+    }
+
+    document.querySelectorAll('#pjFilters .pj-filter:not(.pj-group)').forEach(b=>b.onclick=()=>{
+        pjState.kind=b.dataset.kind;
+        pjState.value=b.dataset.value||null;
+        pjState.openGroup=null;
+        renderProjects();
+    });
+    document.querySelectorAll('#pjFilters .pj-group').forEach(b=>b.onclick=()=>{
+        pjState.openGroup=pjState.openGroup===b.dataset.group?null:b.dataset.group;
+        renderProjects();
+    });
+    document.querySelectorAll('#pjSubFilters .pj-filter').forEach(b=>b.onclick=()=>{
+        pjState.kind=b.dataset.kind;
+        pjState.value=b.dataset.value||null;
+        renderProjects();
+    });
+
+    // 보일 목록 ('전체'만 대표 기본 + 더보기, 나머지 필터는 전체에서 검색)
+    let visible=list;
+    if(pjState.kind==='featured')visible=list.filter(p=>p.featured);
+    else if(pjState.kind==='award')visible=list.filter(p=>p.award);
+    else if(pjState.kind==='field')visible=list.filter(p=>p.field===pjState.value);
+    else if(pjState.kind==='purpose')visible=list.filter(p=>p.purpose===pjState.value);
+    else if(!pjState.showAll){
+        visible=list.filter(p=>p.featured);
+        if(!visible.length)visible=list; // 대표 지정 전 fallback
+    }
+
     const el=document.getElementById('pjCards');
-    el.innerHTML=projects.map(p=>{
+    el.innerHTML=visible.map(p=>{
         const img=p.image_url
             ?'<img class="pjc-img" src="'+esc(p.image_url)+'" alt="'+esc(p.title)+'">'
             :'<div class="pjc-img-placeholder">&#128247; 이미지 추가</div>';
-        const tags=(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
-        return '<a class="pjc" href="/project/'+p.id+'" data-id="'+p.id+'">'+img+'<div class="pjc-body"><div class="pjc-year">'+p.year+'</div>'
+        const award=p.award?'<span class="pjc-award">&#127942; '+esc(p.award)+'</span>':'';
+        const tags=award+(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
+        return '<a class="pjc" href="/project/'+p.id+'" data-id="'+p.id+'">'+img+'<div class="pjc-body"><div class="pjc-year'+(p.featured?' featured':'')+'">'+p.year+'</div>'
             +'<h3>'+esc(p.title)+'</h3><p>'+esc(p.description||'')+'</p>'
             +'<div class="pjc-tags">'+tags+'</div></div></a>';
     }).join('');
@@ -784,7 +877,23 @@ function renderProjects(projects){
         e.preventDefault();
         openProject(+a.dataset.id,true);
     }));
+
+    // 더보기 버튼: '전체'에서 대표 외 항목이 있을 때만
+    const more=document.getElementById('pjMore');
+    const hiddenCount=list.length-list.filter(p=>p.featured).length;
+    if(pjState.kind==='all'&&list.filter(p=>p.featured).length&&hiddenCount>0){
+        more.style.display='block';
+        document.getElementById('pjMoreBtn').textContent=pjState.showAll
+            ?'대표 프로젝트만 보기 ↑'
+            :'전체 '+list.length+'개 보기 ↓';
+    }else{
+        more.style.display='none';
+    }
 }
+document.getElementById('pjMoreBtn').onclick=()=>{
+    pjState.showAll=!pjState.showAll;
+    renderProjects();
+};
 
 /* ─── 프로젝트 상세 팝업 ─── */
 const pjmBg=document.getElementById('pjmBg');
@@ -799,7 +908,8 @@ async function openProject(id,push){
     document.getElementById('dYear').textContent=p.year;
     document.getElementById('dTitle').textContent=p.title;
     document.getElementById('dDesc').textContent=p.description||'';
-    document.getElementById('dTags').innerHTML=(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
+    document.getElementById('dTags').innerHTML=(p.award?'<span style="background:rgba(255,217,61,.1);color:#ffd93d">&#127942; '+esc(p.award)+'</span>':'')
+        +(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
     document.getElementById('dLinks').innerHTML=p.link_url
         ?'<a href="'+esc(p.link_url)+'" target="_blank" rel="noopener">프로젝트 링크 ↗</a>':'';
     document.getElementById('dPermalink').href='/project/'+p.id;

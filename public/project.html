@@ -170,7 +170,8 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
     document.getElementById('pYear').textContent=p.year;
     document.getElementById('pTitle').textContent=p.title;
     document.getElementById('pDesc').textContent=p.description||'';
-    document.getElementById('pTags').innerHTML=(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
+    document.getElementById('pTags').innerHTML=(p.award?'<span style="background:rgba(255,217,61,.1);color:#ffd93d">&#127942; '+esc(p.award)+'</span>':'')
+        +(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
     if(p.link_url){
         document.getElementById('pLinks').innerHTML='<a href="'+esc(p.link_url)+'" target="_blank" rel="noopener">프로젝트 링크 ↗</a>';
     }
