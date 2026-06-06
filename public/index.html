@@ -120,20 +120,53 @@
             background: rgba(255,255,255,0.85);
             transform: translateY(-1px);
         }
-        .hero-links {
-            display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
-            margin-top: 20px; font-size: 0.78rem;
+        /* ─── 햄버거 메뉴 / 사이트맵 드로어 ─── */
+        .menu-btn {
+            position: fixed; top: 26px; left: 26px; z-index: 120;
+            width: 44px; height: 44px; border-radius: 12px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+            backdrop-filter: blur(8px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4.5px;
+            cursor: pointer; transition: all 0.25s;
         }
-        .hero-links a { color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
-        .hero-links a:hover { color: #7eb8ff; }
-        .hero-links .dot { color: rgba(255,255,255,0.15); user-select: none; }
-        .ft-links {
-            display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px;
-            margin-bottom: 12px; font-size: 0.72rem;
+        .menu-btn span {
+            display: block; width: 17px; height: 1.8px; border-radius: 2px;
+            background: rgba(255,255,255,0.6); transition: all 0.25s;
         }
-        .ft-links a { color: rgba(255,255,255,0.25); text-decoration: none; transition: color 0.2s; }
-        .ft-links a:hover { color: #7eb8ff; }
-        .ft-links .dot { color: rgba(255,255,255,0.1); user-select: none; }
+        .menu-btn:hover { background: rgba(255,255,255,0.09); }
+        .menu-btn:hover span { background: #fff; }
+        .drawer-bg {
+            position: fixed; inset: 0; z-index: 130;
+            background: rgba(6,9,17,0.6); backdrop-filter: blur(6px);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .drawer-bg.open { opacity: 1; pointer-events: auto; }
+        .drawer {
+            position: absolute; top: 0; left: 0; bottom: 0; width: 290px;
+            background: #0d1322; border-right: 1px solid rgba(255,255,255,0.07);
+            padding: 32px 34px; overflow-y: auto;
+            transform: translateX(-100%); transition: transform 0.32s cubic-bezier(.22,.8,.3,1);
+            display: flex; flex-direction: column;
+        }
+        .drawer-bg.open .drawer { transform: translateX(0); }
+        .drawer .dw-logo { height: 26px; align-self: flex-start; margin-bottom: 38px; }
+        .dw-label {
+            font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.22); margin-bottom: 12px;
+        }
+        .dw-nav { display: flex; flex-direction: column; gap: 2px; margin-bottom: 36px; }
+        .dw-nav a {
+            font-size: 1.05rem; font-weight: 600; color: rgba(255,255,255,0.55);
+            text-decoration: none; padding: 9px 0; transition: all 0.2s;
+        }
+        .dw-nav a:hover { color: #fff; padding-left: 6px; }
+        .dw-links { display: flex; flex-direction: column; gap: 2px; }
+        .dw-links a {
+            font-size: 0.84rem; color: rgba(255,255,255,0.42);
+            text-decoration: none; padding: 7px 0; transition: all 0.2s;
+        }
+        .dw-links a:hover { color: #7eb8ff; padding-left: 6px; }
+        .dw-links a .ext { font-size: 0.7rem; opacity: 0.5; margin-left: 4px; }
 
         /* RIGHT — STATS */
         .hero-right {
@@ -578,6 +611,26 @@
 </head>
 <body>
 
+<button class="menu-btn" id="menuBtn" title="메뉴">
+    <span></span><span></span><span></span>
+</button>
+
+<div class="drawer-bg" id="drawerBg">
+    <nav class="drawer">
+        <img class="dw-logo" src="소피로고.svg" alt="sofie">
+        <div class="dw-label">메뉴</div>
+        <div class="dw-nav">
+            <a href="#hero">Home</a>
+            <a href="#about">약력</a>
+            <a href="#skills">기술</a>
+            <a href="#exp">경력</a>
+            <a href="#projects">프로젝트</a>
+        </div>
+        <div class="dw-label">채널</div>
+        <div class="dw-links" id="drawerLinks"></div>
+    </nav>
+</div>
+
 <div class="page-ind">
     <a href="#hero" data-sec="hero" data-idx="0" class="active">Home</a>
     <a href="#about" data-sec="about" data-idx="1">약력</a>
@@ -600,7 +653,6 @@
             <h1 id="heroTitle">SW 공학자 이주호</h1>
             <p class="desc" id="heroDesc">SW로 세상의 문제를 해결하는 꿈</p>
             <a href="#exp" class="cta">경력 보러 가기 →</a>
-            <div class="hero-links" id="heroLinks"></div>
         </div>
         <div class="hero-right reveal">
             <div class="stat">
@@ -679,7 +731,6 @@
 
 <footer>
     <img src="소피로고.svg" alt="sofie">
-    <div class="ft-links" id="footLinks"></div>
     <p>&copy; 2026 sofie. All rights reserved.</p>
 </footer>
 </div><!-- /below-hero -->
@@ -1042,15 +1093,20 @@ function renderHero(s){
     let clips=[];
     try{clips=JSON.parse(s.hero_videos||'[]');}catch(e){}
     startVideos(clips.length?clips:defaultClips);
-    // 운영 채널 링크 (히어로 + 푸터)
+    // 운영 채널 링크 → 드로어
     let links=[];
     try{links=JSON.parse(s.hero_links||'[]');}catch(e){}
-    const html=links.filter(l=>l.label&&l.url).map(l=>
-        '<a href="'+esc(l.url)+'" target="_blank" rel="noopener">'+esc(l.label)+'</a>'
-    ).join('<span class="dot">·</span>');
-    document.getElementById('heroLinks').innerHTML=html;
-    document.getElementById('footLinks').innerHTML=html;
+    document.getElementById('drawerLinks').innerHTML=links.filter(l=>l.label&&l.url).map(l=>
+        '<a href="'+esc(l.url)+'" target="_blank" rel="noopener">'+esc(l.label)+'<span class="ext">↗</span></a>'
+    ).join('')||'<span style="font-size:.74rem;color:rgba(255,255,255,.2)">등록된 채널 없음</span>';
 }
+
+/* ─── 햄버거 드로어 ─── */
+const drawerBg=document.getElementById('drawerBg');
+document.getElementById('menuBtn').onclick=()=>drawerBg.classList.add('open');
+drawerBg.addEventListener('click',e=>{if(e.target===drawerBg)drawerBg.classList.remove('open');});
+drawerBg.querySelectorAll('.dw-nav a').forEach(a=>a.addEventListener('click',()=>drawerBg.classList.remove('open')));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')drawerBg.classList.remove('open');});
 
 function renderSkills(s){
     let rows=[];
