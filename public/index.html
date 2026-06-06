@@ -122,51 +122,54 @@
         }
         /* ─── 햄버거 메뉴 / 사이트맵 드로어 ─── */
         .menu-btn {
-            position: fixed; top: 26px; left: 26px; z-index: 120;
-            width: 44px; height: 44px; border-radius: 12px;
-            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
-            backdrop-filter: blur(8px);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4.5px;
+            position: fixed; top: 24px; left: 24px; z-index: 120;
+            width: 48px; height: 48px; /* 터치 영역 확보용 (배경 없음) */
+            border: none; background: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
             cursor: pointer; transition: all 0.25s;
         }
         .menu-btn span {
-            display: block; width: 17px; height: 1.8px; border-radius: 2px;
-            background: rgba(255,255,255,0.6); transition: all 0.25s;
+            display: block; width: 22px; height: 2px; border-radius: 2px;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.45); /* 밝은 배경 대비용 미세 그림자 */
+            transition: all 0.25s;
         }
-        .menu-btn:hover { background: rgba(255,255,255,0.09); }
-        .menu-btn:hover span { background: #fff; }
+        .menu-btn:hover span { background: #fff; width: 25px; }
         .drawer-bg {
             position: fixed; inset: 0; z-index: 130;
-            background: rgba(6,9,17,0.6); backdrop-filter: blur(6px);
+            background: rgba(6,9,17,0.55); backdrop-filter: blur(20px) saturate(.8);
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            display: flex; align-items: center; justify-content: center;
+            overflow-y: auto; padding: 40px 20px;
         }
         .drawer-bg.open { opacity: 1; pointer-events: auto; }
-        .drawer {
-            position: absolute; top: 0; left: 0; bottom: 0; width: 290px;
-            background: #0d1322; border-right: 1px solid rgba(255,255,255,0.07);
-            padding: 32px 34px; overflow-y: auto;
-            transform: translateX(-100%); transition: transform 0.32s cubic-bezier(.22,.8,.3,1);
-            display: flex; flex-direction: column;
+        .launcher {
+            text-align: center; max-width: 600px; width: 100%;
+            transform: translateY(14px) scale(.98); transition: transform 0.32s cubic-bezier(.22,.8,.3,1);
         }
-        .drawer-bg.open .drawer { transform: translateX(0); }
-        .drawer .dw-logo { height: 26px; align-self: flex-start; margin-bottom: 38px; }
-        .dw-label {
-            font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em;
-            color: rgba(255,255,255,0.22); margin-bottom: 12px;
+        .drawer-bg.open .launcher { transform: none; }
+        .launcher .lc-logo { height: 30px; margin-bottom: 8px; }
+        .launcher .lc-sub {
+            font-size: 0.62rem; letter-spacing: 0.28em; text-transform: uppercase;
+            color: rgba(255,255,255,0.28); margin-bottom: 36px;
         }
-        .dw-nav { display: flex; flex-direction: column; gap: 2px; margin-bottom: 36px; }
-        .dw-nav a {
-            font-size: 1.05rem; font-weight: 600; color: rgba(255,255,255,0.55);
-            text-decoration: none; padding: 9px 0; transition: all 0.2s;
+        .svc-grid {
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+            gap: 14px 44px;
         }
-        .dw-nav a:hover { color: #fff; padding-left: 6px; }
-        .dw-links { display: flex; flex-direction: column; gap: 2px; }
-        .dw-links a {
-            font-size: 0.84rem; color: rgba(255,255,255,0.42);
-            text-decoration: none; padding: 7px 0; transition: all 0.2s;
+        .svc {
+            font-size: 1.15rem; font-weight: 700; letter-spacing: -0.01em;
+            color: rgba(255,255,255,0.55); text-decoration: none;
+            padding: 6px 2px; position: relative; transition: color 0.22s;
         }
-        .dw-links a:hover { color: #7eb8ff; padding-left: 6px; }
-        .dw-links a .ext { font-size: 0.7rem; opacity: 0.5; margin-left: 4px; }
+        .svc::after {
+            content: ''; position: absolute; left: 0; right: 100%; bottom: 0;
+            height: 2px; border-radius: 2px; background: #7eb8ff;
+            transition: right 0.25s ease;
+        }
+        .svc:hover { color: #fff; }
+        .svc:hover::after { right: 0; }
+        .svc-empty { font-size: 0.78rem; color: rgba(255,255,255,0.25); padding: 20px 0; }
 
         /* RIGHT — STATS */
         .hero-right {
@@ -616,19 +619,11 @@
 </button>
 
 <div class="drawer-bg" id="drawerBg">
-    <nav class="drawer">
-        <img class="dw-logo" src="소피로고.svg" alt="sofie">
-        <div class="dw-label">메뉴</div>
-        <div class="dw-nav">
-            <a href="#hero">Home</a>
-            <a href="#about">약력</a>
-            <a href="#skills">기술</a>
-            <a href="#exp">경력</a>
-            <a href="#projects">프로젝트</a>
-        </div>
-        <div class="dw-label">채널</div>
-        <div class="dw-links" id="drawerLinks"></div>
-    </nav>
+    <div class="launcher">
+        <img class="lc-logo" src="소피로고.svg" alt="sofie">
+        <div class="lc-sub">Services</div>
+        <div class="svc-grid" id="drawerLinks"></div>
+    </div>
 </div>
 
 <div class="page-ind">
@@ -1093,19 +1088,21 @@ function renderHero(s){
     let clips=[];
     try{clips=JSON.parse(s.hero_videos||'[]');}catch(e){}
     startVideos(clips.length?clips:defaultClips);
-    // 운영 채널 링크 → 드로어
+    // 운영 서비스 → 런처 타일 ("이모지 이름" → 아이콘 + 라벨 분리)
     let links=[];
     try{links=JSON.parse(s.hero_links||'[]');}catch(e){}
-    document.getElementById('drawerLinks').innerHTML=links.filter(l=>l.label&&l.url).map(l=>
-        '<a href="'+esc(l.url)+'" target="_blank" rel="noopener">'+esc(l.label)+'<span class="ext">↗</span></a>'
-    ).join('')||'<span style="font-size:.74rem;color:rgba(255,255,255,.2)">등록된 채널 없음</span>';
+    document.getElementById('drawerLinks').innerHTML=links.filter(l=>l.label&&l.url).map(l=>{
+        // "이모지 이름" → 제목만 표시
+        const parts=String(l.label).trim().split(' ');
+        const name=parts.length>1?parts.slice(1).join(' '):parts[0];
+        return '<a class="svc" href="'+esc(l.url)+'" target="_blank" rel="noopener">'+esc(name)+'</a>';
+    }).join('')||'<div class="svc-empty">등록된 서비스 없음 — admin 사이트 탭에서 추가</div>';
 }
 
-/* ─── 햄버거 드로어 ─── */
+/* ─── 햄버거 → 중앙 서비스 런처 ─── */
 const drawerBg=document.getElementById('drawerBg');
 document.getElementById('menuBtn').onclick=()=>drawerBg.classList.add('open');
 drawerBg.addEventListener('click',e=>{if(e.target===drawerBg)drawerBg.classList.remove('open');});
-drawerBg.querySelectorAll('.dw-nav a').forEach(a=>a.addEventListener('click',()=>drawerBg.classList.remove('open')));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')drawerBg.classList.remove('open');});
 
 function renderSkills(s){
