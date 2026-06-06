@@ -14,8 +14,8 @@ router.get('/content', async (req, res, next) => {
         const [careers, projects, settings] = await Promise.all([
             pool.query('SELECT * FROM careers ORDER BY year DESC, sort_order, id'),
             pool.query('SELECT * FROM projects ORDER BY sort_order, id'),
-            // stat_* 만 공개 (자격증명 등 내부 설정 노출 금지)
-            pool.query(`SELECT key, value FROM settings WHERE key LIKE 'stat\\_%'`),
+            // stat_*/about_* 만 공개 (자격증명 등 내부 설정 노출 금지)
+            pool.query(`SELECT key, value FROM settings WHERE key LIKE 'stat\\_%' OR key LIKE 'about\\_%'`),
         ]);
         res.json({
             careers: careers.rows,
@@ -160,8 +160,8 @@ router.delete('/projects/:id', async (req, res, next) => {
 // ─── 스탯 (settings) ───
 router.put('/settings', async (req, res, next) => {
     try {
-        // stat_* 키만 수정 허용 (자격증명 덮어쓰기 방지)
-        const entries = Object.entries(req.body || {}).filter(([k]) => k.startsWith('stat_'));
+        // stat_*/about_* 키만 수정 허용 (자격증명 덮어쓰기 방지)
+        const entries = Object.entries(req.body || {}).filter(([k]) => k.startsWith('stat_') || k.startsWith('about_'));
         for (const [key, value] of entries) {
             await pool.query(
                 `INSERT INTO settings (key, value) VALUES ($1,$2)

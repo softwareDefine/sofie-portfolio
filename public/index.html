@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sofie</title>
-    <link href="https://hangeul.pstatic.net/hangeul_static/css/NanumSquare Neo.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="/%EC%86%8C%ED%94%BC%EB%A1%9C%EA%B3%A0.svg">
+<link href="https://hangeul.pstatic.net/hangeul_static/css/NanumSquare Neo.css" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; }
@@ -411,15 +412,16 @@
         /* PROJECT DETAIL POPUP */
         .pjm-bg{
             position:fixed;inset:0;z-index:100;
-            background:rgba(0,0,0,.72);backdrop-filter:blur(8px);
+            background:rgba(6,9,17,.88);backdrop-filter:blur(14px) saturate(.6);
             display:none;align-items:flex-start;justify-content:center;
             overflow-y:auto;padding:6vh 16px;
         }
         .pjm-bg.open{display:flex}
         .pjm{
-            background:#0d1322;border:1px solid rgba(255,255,255,.08);
+            background:#0f1626;border:1px solid rgba(255,255,255,.09);
             border-radius:18px;max-width:760px;width:100%;
             padding:38px 42px 34px;position:relative;margin-bottom:6vh;
+            box-shadow:0 24px 80px rgba(0,0,0,.55);
             animation:fadeUp .35s ease;
         }
         .pjm-close{
@@ -594,23 +596,13 @@
     <h2 class="sec-h reveal">약력 소개</h2>
     <div class="about-cols">
         <div class="about-text reveal" style="display:flex;flex-direction:column;align-items:center;text-align:center;">
-            <img src="스크린샷 2025-09-04 152021.jpg.png" alt="이주호" class="profile-photo">
-            <p style="font-size:1.1rem;font-weight:700;color:rgba(255,255,255,0.7);margin-top:0.8rem;">SW로 기존 개념을 재정의하여 문제를 해결합니다.</p>
-            <p style="margin-top:1.2rem;">안녕하세요, 이주호입니다. 2013년에 앱·웹 개발로 코딩을 시작했고, 서버 개발을 거치면서 자연스럽게 백엔드와 인프라를 맡게 됐습니다. 지금은 경험을 넓혀가면서 팀장으로 프로젝트를 이끌고 있고, SW로 실제 문제를 풀어내는 일을 하고 있습니다.</p>
-            <div style="margin-top:1.2rem;font-size:0.82rem;color:rgba(255,255,255,0.45);line-height:1.8;">
-                &#128222; 010-7463-7310<br>
-                &#9993; juho0601@naver.com
-            </div>
+            <img src="" alt="프로필" class="profile-photo" id="aboutPhoto" style="display:none">
+            <p id="aboutHeadline" style="font-size:1.1rem;font-weight:700;color:rgba(255,255,255,0.7);margin-top:0.8rem;"></p>
+            <p id="aboutIntro" style="margin-top:1.2rem;"></p>
+            <div id="aboutContact" style="margin-top:1.2rem;font-size:0.82rem;color:rgba(255,255,255,0.45);line-height:1.8;"></div>
         </div>
         <div class="about-text reveal">
-            <table style="width:100%;border-collapse:collapse;">
-                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;width:80px;">이름</td><td style="padding:8px 0;font-size:0.88rem;">이주호</td></tr>
-                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.05);">출생</td><td style="padding:8px 0;font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.05);">2006년</td></tr>
-                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.05);">학력</td><td style="padding:8px 0;font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.05);">現 성균관대학교 소프트웨어학과 25학번 (3.74/4.5)<br>前 선린인터넷고등학교 소프트웨어과 117기 (전교 3등)</td></tr>
-                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.05);">대표경력</td><td style="padding:8px 0;font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.05);line-height:1.8;">現 AI·SW마에스트로 17기 팀장<br>前 삼성SW히어로즈 2018~2019<br>前 선린인터넷고 서버전공동아리 AnA 13기 부장<br>한국정보올림피아드 4회 수상<br>삼성주소창 대회 장려상<br>DDP, 킨텍스 대표 전시 경험<br><a href="https://solved.ac/profile/yangpyeong" target="_blank" style="color:#7eb8ff;text-decoration:none;">백준 다이아5 : yangpyeong ↗</a></td></tr>
-                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.05);">자격증</td><td style="padding:8px 0;font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.05);line-height:1.8;">COS Pro C++ 1급<br>네트워크관리사 1급 / 2급<br>리눅스마스터 2급<br>정보처리기능사</td></tr>
-                <tr><td style="padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;border-top:1px solid rgba(255,255,255,0.05);">포지션</td><td style="padding:8px 0;font-size:0.88rem;border-top:1px solid rgba(255,255,255,0.05);">백엔드 · 인프라 · PM · AI/ML</td></tr>
-            </table>
+            <table id="aboutTable" style="width:100%;border-collapse:collapse;"></table>
         </div>
     </div>
 </section>
@@ -854,6 +846,34 @@ window.addEventListener('popstate',()=>{
     else closeProject(false);
 });
 
+function renderAbout(s){
+    const photo=document.getElementById('aboutPhoto');
+    if(s.about_photo){photo.src=s.about_photo;photo.style.display='block';}
+    document.getElementById('aboutHeadline').textContent=s.about_headline||'';
+    document.getElementById('aboutIntro').textContent=s.about_intro||'';
+    const contact=[];
+    if(s.about_phone)contact.push('&#128222; '+esc(s.about_phone));
+    if(s.about_email)contact.push('&#9993; '+esc(s.about_email));
+    document.getElementById('aboutContact').innerHTML=contact.join('<br>');
+    // 값: 줄바꿈 + 마크다운 링크 지원
+    let rows=[];
+    try{rows=JSON.parse(s.about_rows||'[]');}catch(e){}
+    const tdL='padding:8px 0;color:rgba(255,255,255,0.35);font-size:0.78rem;vertical-align:top;';
+    const tdR='padding:8px 0;font-size:0.88rem;line-height:1.8;';
+    const bt='border-top:1px solid rgba(255,255,255,0.05);';
+    document.getElementById('aboutTable').innerHTML=rows.map((r,i)=>{
+        const val=String(r.value||'').split('\n').map(line=>
+            DOMPurify.sanitize(marked.parseInline(line),{ADD_ATTR:['target']})
+        ).join('<br>');
+        return '<tr><td style="'+tdL+(i?bt:'width:80px;')+'">'+esc(r.label)+'</td>'
+            +'<td style="'+tdR+(i?bt:'')+'">'+val+'</td></tr>';
+    }).join('');
+    document.getElementById('aboutTable').querySelectorAll('a').forEach(a=>{
+        a.target='_blank';a.rel='noopener';
+        a.style.color='#7eb8ff';a.style.textDecoration='none';
+    });
+}
+
 function renderStats(settings){
     const map=[['stat_years',0],['stat_projects',1],['stat_activities',2]];
     const counts=document.querySelectorAll('.count');
@@ -869,6 +889,7 @@ function renderStats(settings){
         if(!res.ok)throw new Error('HTTP '+res.status);
         const data=await res.json();
         renderStats(data.settings);
+        renderAbout(data.settings);
         renderTimeline(data.careers);
         renderProjects(data.projects);
     }catch(e){

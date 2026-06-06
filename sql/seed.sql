@@ -90,3 +90,13 @@ SELECT * FROM (VALUES
     ('stat_activities', '54')
 ) AS v(key, value)
 WHERE NOT EXISTS (SELECT 1 FROM settings);
+
+-- 약력 소개 (키 단위로 없을 때만 추가)
+INSERT INTO settings (key, value) VALUES
+    ('about_photo',    '스크린샷 2025-09-04 152021.jpg.png'),
+    ('about_headline', 'SW로 기존 개념을 재정의하여 문제를 해결합니다.'),
+    ('about_intro',    '안녕하세요, 이주호입니다. 2013년에 앱·웹 개발로 코딩을 시작했고, 서버 개발을 거치면서 자연스럽게 백엔드와 인프라를 맡게 됐습니다. 지금은 경험을 넓혀가면서 팀장으로 프로젝트를 이끌고 있고, SW로 실제 문제를 풀어내는 일을 하고 있습니다.'),
+    ('about_phone',    '010-7463-7310'),
+    ('about_email',    'juho0601@naver.com'),
+    ('about_rows',     '[{"label":"이름","value":"이주호"},{"label":"출생","value":"2006년"},{"label":"학력","value":"現 성균관대학교 소프트웨어학과 25학번 (3.74/4.5)\n前 선린인터넷고등학교 소프트웨어과 117기 (전교 3등)"},{"label":"대표경력","value":"現 AI·SW마에스트로 17기 팀장\n前 삼성SW히어로즈 2018~2019\n前 선린인터넷고 서버전공동아리 AnA 13기 부장\n한국정보올림피아드 4회 수상\n삼성주소창 대회 장려상\nDDP, 킨텍스 대표 전시 경험\n[백준 다이아5 : yangpyeong ↗](https://solved.ac/profile/yangpyeong)"},{"label":"자격증","value":"COS Pro C++ 1급\n네트워크관리사 1급 / 2급\n리눅스마스터 2급\n정보처리기능사"},{"label":"포지션","value":"백엔드 · 인프라 · PM · AI/ML"}]')
+ON CONFLICT (key) DO NOTHING;
