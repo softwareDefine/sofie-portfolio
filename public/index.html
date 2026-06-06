@@ -292,6 +292,11 @@
             background: var(--dot, #7eb8ff);
         }
         .tl-panel li strong { font-size: 0.95rem; }
+        .tl-panel li.tl-clk { cursor: pointer; transition: background 0.2s; }
+        .tl-panel li.tl-clk:hover { background: rgba(255,255,255,0.03); }
+        .tl-panel li.tl-clk:hover strong, .tl-panel li.tl-clk:hover { color: #fff; }
+        .tl-more { color: rgba(126,184,255,0.45); font-size: 0.72rem; }
+        .tl-clk:hover .tl-more { color: #7eb8ff; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
         /* PROJECTS — cards */
@@ -314,7 +319,7 @@
             animation: fadeUp 0.25s ease;
         }
         .pjc-award { font-size: 0.63rem; font-weight: 600; padding: 3px 8px; border-radius: 5px; background: rgba(255,217,61,0.1); color: #ffd93d; }
-        .pj-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .pj-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
         a.pjc { display: block; color: inherit; text-decoration: none; cursor: pointer; }
         .pjc-year.featured { color: #ffd93d; }
         .pj-more { text-align: center; margin-top: 22px; }
@@ -334,38 +339,25 @@
         }
         .pjc:hover { border-color: rgba(255,255,255,0.12); transform: translateY(-3px); background: rgba(255,255,255,0.05); }
         .pjc-img {
-            width: 100%; height: 140px;
+            width: 100%; height: 130px;
             object-fit: cover;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             display: block;
         }
         .pjc-img-placeholder {
-            width: 100%; height: 140px;
+            width: 100%; height: 130px;
             display: flex; align-items: center; justify-content: center;
             background: rgba(255,255,255,0.02);
             border-bottom: 1px solid rgba(255,255,255,0.05);
             color: rgba(255,255,255,0.12);
             font-size: 0.75rem;
         }
-        .pjc-body { padding: 1.2rem 1.4rem; }
-        .pjc-year { font-size: 0.65rem; font-weight: 600; color: #7eb8ff; margin-bottom: 8px; }
-        .pjc h3 { font-size: 0.92rem; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 4px; }
-        .pjc > p { font-size: 0.75rem; color: rgba(255,255,255,0.35); line-height: 1.6; margin-bottom: 10px; }
-        .pjc-tags { display: flex; flex-wrap: wrap; gap: 4px; }
-        .pjc-tags span { font-size: 0.63rem; font-weight: 500; padding: 3px 8px; border-radius: 5px; background: rgba(100,180,255,0.07); color: #7eb8ff; }
-
-        .pj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .pjc { border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); transition: all 0.3s; }
-        .pjc:hover { border-color: rgba(255,255,255,0.08); transform: translateY(-2px); }
-        .pj-top { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .pj-bd { padding: 1.1rem 1.3rem; }
-        .pj-bd h3 { font-size: 0.88rem; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 3px; }
-        .pj-bd > p { font-size: 0.73rem; color: rgba(255,255,255,0.35); line-height: 1.6; margin-bottom: 8px; }
-        .pj-ch { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 8px; }
-        .pj-ch span { font-size: 0.62rem; font-weight: 500; padding: 2px 7px; border-radius: 4px; background: rgba(100,180,255,0.07); color: #7eb8ff; }
-        .pj-lk { display: flex; gap: 10px; }
-        .pj-lk a { font-size: 0.72rem; color: rgba(255,255,255,0.28); text-decoration: none; }
-        .pj-lk a:hover { color: #7eb8ff; }
+        .pjc-body { padding: 1.15rem 1.25rem 1.25rem; }
+        .pjc-year { font-size: 0.65rem; font-weight: 700; color: #7eb8ff; letter-spacing: 0.05em; margin-bottom: 9px; }
+        .pjc h3 { font-size: 0.89rem; font-weight: 700; color: rgba(255,255,255,0.88); line-height: 1.45; margin-bottom: 6px; }
+        .pjc-body p { font-size: 0.73rem; color: rgba(255,255,255,0.38); line-height: 1.65; margin-bottom: 12px; }
+        .pjc-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+        .pjc-tags span { font-size: 0.63rem; font-weight: 500; padding: 4px 9px; border-radius: 5px; background: rgba(100,180,255,0.07); color: #7eb8ff; }
 
         /* EXP */
         .exp-list { display: flex; flex-direction: column; gap: 6px; }
@@ -526,6 +518,7 @@
 
         /* ─── TABLET ─── */
         @media (max-width: 1024px) {
+            .pj-cards { grid-template-columns: repeat(2, 1fr); }
             .hero { padding: 0 2rem; }
             .hero-content { max-width: 100%; gap: 2rem; }
             .stat .number { font-size: 2.6rem; }
@@ -764,8 +757,10 @@ function applyTlColor(yr){
 
 function careerLi(c,showYear){
     const yr=showYear?' <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;">'+c.year+'</span>':'';
-    if(c.featured) return '<li><strong style="color:#fff;">'+esc(c.title)+'</strong>'+yr+'</li>';
-    return '<li>'+esc(c.title)+yr+'</li>';
+    const has=c.content&&c.content.trim();
+    const body=c.featured?'<strong style="color:#fff;">'+esc(c.title)+'</strong>':esc(c.title);
+    if(has)return '<li class="tl-clk" data-id="'+c.id+'" title="자세히 보기">'+body+yr+' <span class="tl-more">↗</span></li>';
+    return '<li>'+body+yr+'</li>';
 }
 
 function renderTimeline(careers){
@@ -787,6 +782,11 @@ function renderTimeline(careers){
     });
     tlContent.innerHTML=html;
 
+    // 본문 있는 경력 → 클릭 시 상세 팝업
+    tlContent.querySelectorAll('li.tl-clk').forEach(li=>{
+        li.addEventListener('click',()=>openCareer(+li.dataset.id,true));
+    });
+
     document.querySelectorAll('.tl-yr').forEach(btn=>{
         btn.addEventListener('click',()=>{
             document.querySelectorAll('.tl-yr').forEach(b=>b.classList.remove('active'));
@@ -796,6 +796,15 @@ function renderTimeline(careers){
             applyTlColor(btn.dataset.year);
         });
     });
+}
+
+// 수상명 → 메달 (대상·금상 🥇 / 은상 🥈 / 동상 🥉 / 장려·입선 🏅 / 그 외 🏆)
+function awardIcon(award){
+    if(/대상|금상|최우수|1등/.test(award))return '\u{1F947}';
+    if(/은상|2등/.test(award))return '\u{1F948}';
+    if(/동상|3등/.test(award))return '\u{1F949}';
+    if(/장려|입선|특별/.test(award))return '\u{1F3C5}';
+    return '\u{1F3C6}';
 }
 
 let allProjects=[];
@@ -865,7 +874,7 @@ function renderProjects(projects){
         const img=p.image_url
             ?'<img class="pjc-img" src="'+esc(p.image_url)+'" alt="'+esc(p.title)+'">'
             :'<div class="pjc-img-placeholder">&#128247; 이미지 추가</div>';
-        const award=p.award?'<span class="pjc-award">&#127942; '+esc(p.award)+'</span>':'';
+        const award=p.award?'<span class="pjc-award">'+awardIcon(p.award)+' '+esc(p.award)+'</span>':'';
         const tags=award+(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
         return '<a class="pjc" href="/project/'+p.id+'" data-id="'+p.id+'">'+img+'<div class="pjc-body"><div class="pjc-year'+(p.featured?' featured':'')+'">'+p.year+'</div>'
             +'<h3>'+esc(p.title)+'</h3><p>'+esc(p.description||'')+'</p>'
@@ -895,26 +904,11 @@ document.getElementById('pjMoreBtn').onclick=()=>{
     renderProjects();
 };
 
-/* ─── 프로젝트 상세 팝업 ─── */
+/* ─── 상세 팝업 (프로젝트/경력 공용) ─── */
 const pjmBg=document.getElementById('pjmBg');
-async function openProject(id,push){
-    let p;
-    try{
-        const res=await fetch('/api/projects/'+id);
-        if(!res.ok)throw new Error();
-        p=await res.json();
-    }catch(e){return;}
+let detailBack='/#projects'; // 닫을 때 돌아갈 위치
 
-    document.getElementById('dYear').textContent=p.year;
-    document.getElementById('dTitle').textContent=p.title;
-    document.getElementById('dDesc').textContent=p.description||'';
-    document.getElementById('dTags').innerHTML=(p.award?'<span style="background:rgba(255,217,61,.1);color:#ffd93d">&#127942; '+esc(p.award)+'</span>':'')
-        +(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
-    document.getElementById('dLinks').innerHTML=p.link_url
-        ?'<a href="'+esc(p.link_url)+'" target="_blank" rel="noopener">프로젝트 링크 ↗</a>':'';
-    document.getElementById('dPermalink').href='/project/'+p.id;
-
-    const imgs=(p.images&&p.images.length)?p.images:(p.image_url?[p.image_url]:[]);
+function fillDetailGallery(imgs){
     const g=document.getElementById('dGallery');
     if(imgs.length){
         g.style.display='block';
@@ -931,29 +925,76 @@ async function openProject(id,push){
     }else{
         g.style.display='none';
     }
-
-    const md=(p.content||'').trim();
-    document.getElementById('dContent').innerHTML=md
-        ?DOMPurify.sanitize(marked.parse(md))
-        :'<p class="empty">아직 작성된 내용이 없습니다.</p>';
-
+}
+function showDetail(){
     pjmBg.classList.add('open');
     pjmBg.scrollTop=0;
     document.body.style.overflow='hidden';
+}
+function fillDetailContent(md){
+    document.getElementById('dContent').innerHTML=(md||'').trim()
+        ?DOMPurify.sanitize(marked.parse(md))
+        :'<p class="empty">아직 작성된 내용이 없습니다.</p>';
+}
+
+async function openProject(id,push){
+    let p;
+    try{
+        const res=await fetch('/api/projects/'+id);
+        if(!res.ok)throw new Error();
+        p=await res.json();
+    }catch(e){return;}
+
+    detailBack='/#projects';
+    document.getElementById('dYear').textContent=p.year;
+    document.getElementById('dTitle').textContent=p.title;
+    document.getElementById('dDesc').textContent=p.description||'';
+    document.getElementById('dTags').innerHTML=(p.award?'<span style="background:rgba(255,217,61,.1);color:#ffd93d">'+awardIcon(p.award)+' '+esc(p.award)+'</span>':'')
+        +(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
+    document.getElementById('dLinks').innerHTML=p.link_url
+        ?'<a href="'+esc(p.link_url)+'" target="_blank" rel="noopener">프로젝트 링크 ↗</a>':'';
+    document.getElementById('dPermalink').href='/project/'+p.id;
+    fillDetailGallery((p.images&&p.images.length)?p.images:(p.image_url?[p.image_url]:[]));
+    fillDetailContent(p.content);
+    showDetail();
     if(push)history.pushState({project:id},'','/project/'+id);
 }
-function closeProject(push){
+
+async function openCareer(id,push){
+    let c;
+    try{
+        const res=await fetch('/api/careers/'+id);
+        if(!res.ok)throw new Error();
+        c=await res.json();
+    }catch(e){return;}
+
+    detailBack='/#exp';
+    document.getElementById('dYear').textContent=c.year;
+    document.getElementById('dTitle').textContent=c.title;
+    document.getElementById('dDesc').textContent='';
+    document.getElementById('dTags').innerHTML='';
+    document.getElementById('dLinks').innerHTML='';
+    document.getElementById('dPermalink').href='/career/'+c.id;
+    fillDetailGallery(c.images||[]);
+    fillDetailContent(c.content);
+    showDetail();
+    if(push)history.pushState({career:id},'','/career/'+id);
+}
+
+function closeDetail(push){
     pjmBg.classList.remove('open');
     document.body.style.overflow='';
-    if(push)history.pushState({},'','/#projects');
+    if(push)history.pushState({},'',detailBack);
 }
-document.getElementById('pjmClose').onclick=()=>closeProject(true);
-pjmBg.addEventListener('click',e=>{if(e.target===pjmBg)closeProject(true);});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&pjmBg.classList.contains('open'))closeProject(true);});
+document.getElementById('pjmClose').onclick=()=>closeDetail(true);
+pjmBg.addEventListener('click',e=>{if(e.target===pjmBg)closeDetail(true);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&pjmBg.classList.contains('open'))closeDetail(true);});
 window.addEventListener('popstate',()=>{
-    const m=location.pathname.match(/^\/project\/(\d+)$/);
-    if(m)openProject(+m[1],false);
-    else closeProject(false);
+    let m=location.pathname.match(/^\/project\/(\d+)$/);
+    if(m)return openProject(+m[1],false);
+    m=location.pathname.match(/^\/career\/(\d+)$/);
+    if(m)return openCareer(+m[1],false);
+    closeDetail(false);
 });
 
 function renderAbout(s){

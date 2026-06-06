@@ -26,6 +26,7 @@ app.use(cookieSession({
 app.use('/api', api);
 app.get('/admin', requireInternal, (req, res) => res.sendFile(path.join(__dirname, 'views', 'admin.html')));
 app.get('/project/:id(\\d+)', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'project.html')));
+app.get('/career/:id(\\d+)', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'career.html')));
 // 링크 태그 없이 직접 /favicon.ico 요청하는 클라이언트 대응
 app.get('/favicon.ico', (req, res) => {
     res.type('image/svg+xml');

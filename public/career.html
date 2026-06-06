@@ -21,37 +21,23 @@ a{color:#7eb8ff;text-decoration:none}
     background:rgba(10,14,26,.85);backdrop-filter:blur(12px);
     border-bottom:1px solid rgba(255,255,255,.04);
 }
-.back{
-    font-size:.78rem;color:rgba(255,255,255,.45);transition:color .2s;
-}
+.back{font-size:.78rem;color:rgba(255,255,255,.45);transition:color .2s}
 .back:hover{color:#fff}
 .topbar img{height:26px}
 .topbar .spacer{width:90px}
 
 .wrap{max-width:840px;margin:0 auto;padding:56px 6vw 80px}
 
-.pj-year{font-size:.72rem;font-weight:700;color:#7eb8ff;letter-spacing:.08em;margin-bottom:10px}
-h1{font-size:2rem;font-weight:800;letter-spacing:-0.02em;line-height:1.25;margin-bottom:14px}
-.pj-desc{font-size:.92rem;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:18px}
-.pj-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}
-.pj-tags span{font-size:.68rem;font-weight:500;padding:4px 11px;border-radius:6px;background:rgba(100,180,255,.08);color:#7eb8ff}
-.pj-links{display:flex;gap:10px;margin-bottom:8px}
-.pj-links a{
-    font-size:.74rem;padding:8px 18px;border-radius:100px;
-    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
-    color:rgba(255,255,255,.7);transition:all .2s;
-}
-.pj-links a:hover{background:rgba(255,255,255,.1);color:#fff}
-
-.divider{height:1px;background:rgba(255,255,255,.05);margin:34px 0}
+.c-year{font-size:.72rem;font-weight:700;color:#7eb8ff;letter-spacing:.08em;margin-bottom:10px}
+h1{font-size:1.8rem;font-weight:800;letter-spacing:-0.02em;line-height:1.3;margin-bottom:14px}
+.divider{height:1px;background:rgba(255,255,255,.05);margin:30px 0}
 
 /* gallery */
 .gallery{margin-bottom:8px}
 .g-main{
     width:100%;max-height:480px;object-fit:contain;
     border-radius:14px;border:1px solid rgba(255,255,255,.06);
-    background:rgba(255,255,255,.02);
-    cursor:zoom-in;
+    background:rgba(255,255,255,.02);cursor:zoom-in;
 }
 .g-thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .g-thumbs img{
@@ -61,7 +47,6 @@ h1{font-size:2rem;font-weight:800;letter-spacing:-0.02em;line-height:1.25;margin
 .g-thumbs img:hover{opacity:.85}
 .g-thumbs img.active{border-color:#7eb8ff;opacity:1}
 
-/* lightbox */
 .lightbox{
     position:fixed;inset:0;z-index:50;display:none;
     align-items:center;justify-content:center;
@@ -109,7 +94,7 @@ footer{text-align:center;padding:40px 0 30px}
 footer img{height:22px;opacity:.2}
 
 @media(max-width:600px){
-    h1{font-size:1.45rem}
+    h1{font-size:1.35rem}
     .wrap{padding:36px 1.4rem 60px}
     .topbar{padding:14px 1.4rem}
 }
@@ -118,17 +103,14 @@ footer img{height:22px;opacity:.2}
 <body>
 
 <div class="topbar">
-    <a class="back" href="/#projects">← 프로젝트 목록</a>
+    <a class="back" href="/#exp">← 세부 경력</a>
     <a href="/"><img src="/소피로고.svg" alt="sofie"></a>
     <div class="spacer"></div>
 </div>
 
 <div class="wrap" id="content" style="display:none">
-    <div class="pj-year" id="pYear"></div>
-    <h1 id="pTitle"></h1>
-    <p class="pj-desc" id="pDesc"></p>
-    <div class="pj-tags" id="pTags"></div>
-    <div class="pj-links" id="pLinks"></div>
+    <div class="c-year" id="cYear"></div>
+    <h1 id="cTitle"></h1>
 
     <div class="divider"></div>
 
@@ -137,12 +119,12 @@ footer img{height:22px;opacity:.2}
         <div class="g-thumbs" id="gThumbs"></div>
     </div>
 
-    <div class="md" id="pContent"></div>
+    <div class="md" id="cContent"></div>
 </div>
 
 <div class="err" id="notFound" style="display:none">
-    <h2>프로젝트를 찾을 수 없습니다</h2>
-    <p><a href="/#projects">← 목록으로 돌아가기</a></p>
+    <h2>경력을 찾을 수 없습니다</h2>
+    <p><a href="/#exp">← 세부 경력으로 돌아가기</a></p>
 </div>
 
 <div class="lightbox" id="lightbox"><img id="lbImg" alt=""></div>
@@ -153,39 +135,24 @@ footer img{height:22px;opacity:.2}
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.5/dist/purify.min.js"></script>
 <script>
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-// 수상명 → 메달 (대상·금상 🥇 / 은상 🥈 / 동상 🥉 / 장려·입선 🏅 / 그 외 🏆)
-function awardIcon(award){
-    if(/대상|금상|최우수|1등/.test(award))return '\u{1F947}';
-    if(/은상|2등/.test(award))return '\u{1F948}';
-    if(/동상|3등/.test(award))return '\u{1F949}';
-    if(/장려|입선|특별/.test(award))return '\u{1F3C5}';
-    return '\u{1F3C6}';
-}
 
 (async()=>{
     const id=location.pathname.split('/').pop();
-    let p;
+    let c;
     try{
-        const res=await fetch('/api/projects/'+id);
+        const res=await fetch('/api/careers/'+id);
         if(!res.ok)throw new Error();
-        p=await res.json();
+        c=await res.json();
     }catch(e){
         document.getElementById('notFound').style.display='block';
         return;
     }
 
-    document.title=p.title+' — sofie';
-    document.getElementById('pYear').textContent=p.year;
-    document.getElementById('pTitle').textContent=p.title;
-    document.getElementById('pDesc').textContent=p.description||'';
-    document.getElementById('pTags').innerHTML=(p.award?'<span style="background:rgba(255,217,61,.1);color:#ffd93d">'+awardIcon(p.award)+' '+esc(p.award)+'</span>':'')
-        +(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('');
-    if(p.link_url){
-        document.getElementById('pLinks').innerHTML='<a href="'+esc(p.link_url)+'" target="_blank" rel="noopener">프로젝트 링크 ↗</a>';
-    }
+    document.title=c.title+' — sofie';
+    document.getElementById('cYear').textContent=c.year;
+    document.getElementById('cTitle').textContent=c.title;
 
-    // 갤러리: images[] 우선, 없으면 썸네일 한 장이라도
-    const imgs=(p.images&&p.images.length)?p.images:(p.image_url?[p.image_url]:[]);
+    const imgs=c.images||[];
     if(imgs.length){
         const g=document.getElementById('gallery');
         const main=document.getElementById('gMain');
@@ -200,20 +167,16 @@ function awardIcon(award){
                 t.classList.add('active');
             });
         }
-        // lightbox
         const lb=document.getElementById('lightbox');
         main.onclick=()=>{document.getElementById('lbImg').src=main.src;lb.classList.add('open');};
         lb.onclick=()=>lb.classList.remove('open');
         document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('open');});
     }
 
-    // 마크다운 본문
-    const md=(p.content||'').trim();
-    if(md){
-        document.getElementById('pContent').innerHTML=DOMPurify.sanitize(marked.parse(md));
-    }else{
-        document.getElementById('pContent').innerHTML='<p class="empty">아직 작성된 내용이 없습니다.</p>';
-    }
+    const md=(c.content||'').trim();
+    document.getElementById('cContent').innerHTML=md
+        ?DOMPurify.sanitize(marked.parse(md))
+        :'<p class="empty">아직 작성된 내용이 없습니다.</p>';
 
     document.getElementById('content').style.display='block';
 })();

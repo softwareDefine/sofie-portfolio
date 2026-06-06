@@ -101,7 +101,7 @@ button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:50;overflow-y:auto;padding:8vh 16px}
 .modal-bg.open{display:flex}
 .modal{background:#11182a;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:26px;width:100%;max-width:460px}
-#projectModal .modal{max-width:580px}
+#projectModal .modal,#careerModal .modal{max-width:580px}
 .modal h2{font-size:1rem;margin-bottom:18px}
 .field{margin-bottom:12px}
 .field label{display:block;font-size:.7rem;color:rgba(255,255,255,.4);margin-bottom:5px}
@@ -208,6 +208,19 @@ button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight
         <div class="field"><label>연도</label><input type="number" id="c_year"></div>
         <div class="field"><label>내용</label><input type="text" id="c_title"></div>
         <div class="field"><div class="inline"><input type="checkbox" id="c_featured"><label for="c_featured" style="margin:0;cursor:pointer">핵심경력에 표시 (메인에서 굵게 강조)</label></div></div>
+        <div class="field">
+            <label>갤러리 이미지 (상세 팝업용, 여러 장 가능)</label>
+            <div id="c_galleryList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+            <div class="dropzone" id="c_dropzone">
+                <span class="dz-ic">&#128228;</span>
+                클릭하거나 이미지를 끌어다 놓으세요
+            </div>
+            <input type="file" id="c_gallery" accept="image/*" multiple class="file-hidden">
+        </div>
+        <div class="field">
+            <label>상세 내용 (마크다운 — 작성하면 메인에서 클릭해 볼 수 있음)</label>
+            <textarea id="c_content" rows="8" placeholder="## 활동 내용&#10;..." style="font-family:Consolas,monospace;font-size:.78rem;line-height:1.6"></textarea>
+        </div>
         <div class="actions">
             <button class="btn-ghost" onclick="closeModal('careerModal')">취소</button>
             <button class="btn-pri" id="careerSaveBtn">저장</button>
@@ -395,7 +408,9 @@ function renderCareers(){
         +careers.filter(c=>c.year===y).map(c=>
             '<div class="row" data-id="'+c.id+'">'
             +'<span class="handle" title="드래그로 순서 변경">⠿</span>'
-            +'<div class="grow"><div class="title">'+esc(c.title)+'</div></div>'
+            +'<div class="grow"><div class="title">'+esc(c.title)
+            +(c.content&&c.content.trim()?' <span title="상세 내용 있음" style="font-size:.7rem;opacity:.55">&#128196;</span>':'')
+            +'</div></div>'
             +(c.featured?'<span class="badge">핵심</span>':'')
             +'<button class="btn-ghost btn-sm" onclick="openCareerModal('+c.id+')">수정</button>'
             +'<button class="btn-danger btn-sm" onclick="delCareer('+c.id+')">삭제</button>'
@@ -405,13 +420,25 @@ function renderCareers(){
     document.querySelectorAll('#careerList .drag-group').forEach(g=>attachDrag(g,'/careers/reorder'));
 }
 
-let editingCareer=null;
+let editingCareer=null, careerGallery=[];
+function renderCareerGallery(){
+    document.getElementById('c_galleryList').innerHTML=careerGallery.map((u,i)=>
+        '<div style="position:relative">'
+        +'<img class="thumb" src="'+esc(u)+'">'
+        +'<button onclick="careerGallery.splice('+i+',1);renderCareerGallery()" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#ff5050;color:#fff;border:none;font-size:.6rem;line-height:1;padding:0;cursor:pointer">✕</button>'
+        +'</div>'
+    ).join('');
+}
 function openCareerModal(id){
     editingCareer=id?careers.find(c=>c.id===id):null;
+    careerGallery=editingCareer?[...(editingCareer.images||[])]:[];
     document.getElementById('careerModalTitle').textContent=editingCareer?'경력 수정':'경력 추가';
     document.getElementById('c_year').value=editingCareer?editingCareer.year:new Date().getFullYear();
     document.getElementById('c_title').value=editingCareer?editingCareer.title:'';
     document.getElementById('c_featured').checked=editingCareer?editingCareer.featured:false;
+    document.getElementById('c_content').value=editingCareer?(editingCareer.content||''):'';
+    document.getElementById('c_gallery').value='';
+    renderCareerGallery();
     document.getElementById('careerModal').classList.add('open');
 }
 document.getElementById('careerSaveBtn').onclick=async()=>{
@@ -419,6 +446,8 @@ document.getElementById('careerSaveBtn').onclick=async()=>{
         year:parseInt(document.getElementById('c_year').value,10),
         title:document.getElementById('c_title').value.trim(),
         featured:document.getElementById('c_featured').checked,
+        content:document.getElementById('c_content').value,
+        images:careerGallery,
     };
     if(!body.title||isNaN(body.year))return toast('연도와 내용을 입력해');
     try{
@@ -492,11 +521,11 @@ function removeImage(){
     document.getElementById('p_imgRemove').classList.add('hidden');
     document.getElementById('p_image').value='';
 }
-async function uploadGalleryFiles(files){
+// 공용 다중 업로드: files → /api/upload → arr에 push
+async function uploadImagesTo(files,arr,dzEl,renderFn){
     files=[...files].filter(f=>f.type.startsWith('image/'));
     if(!files.length)return;
-    const dz=document.getElementById('p_dropzone');
-    dz.classList.add('busy');
+    dzEl.classList.add('busy');
     let ok=0;
     for(const file of files){
         const fd=new FormData();fd.append('image',file);
@@ -504,26 +533,24 @@ async function uploadGalleryFiles(files){
             const res=await fetch('/api/upload',{method:'POST',body:fd});
             const data=await res.json();
             if(!res.ok)throw new Error(data.error||'업로드 실패');
-            galleryImages.push(data.url);ok++;
+            arr.push(data.url);ok++;
         }catch(err){toast(file.name+': '+err.message);}
     }
-    dz.classList.remove('busy');
-    renderGalleryList();
+    dzEl.classList.remove('busy');
+    renderFn();
     if(ok)toast('갤러리 '+ok+'장 업로드됨');
 }
-document.getElementById('p_gallery').addEventListener('change',e=>{
-    uploadGalleryFiles(e.target.files);
-    e.target.value='';
-});
-const dz=document.getElementById('p_dropzone');
-dz.onclick=()=>document.getElementById('p_gallery').click();
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
-dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
-dz.addEventListener('drop',e=>{
-    e.preventDefault();
-    dz.classList.remove('dragover');
-    uploadGalleryFiles(e.dataTransfer.files);
-});
+// 드롭존 + 파일 인풋 연결
+function wireDropzone(dzId,inputId,handler){
+    const dz=document.getElementById(dzId), inp=document.getElementById(inputId);
+    dz.onclick=()=>inp.click();
+    dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
+    dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+    dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragover');handler(e.dataTransfer.files);});
+    inp.addEventListener('change',e=>{handler(e.target.files);e.target.value='';});
+}
+wireDropzone('p_dropzone','p_gallery',files=>uploadImagesTo(files,galleryImages,document.getElementById('p_dropzone'),renderGalleryList));
+wireDropzone('c_dropzone','c_gallery',files=>uploadImagesTo(files,careerGallery,document.getElementById('c_dropzone'),renderCareerGallery));
 document.getElementById('p_image').addEventListener('change',async e=>{
     const file=e.target.files[0];
     if(!file)return;

@@ -37,6 +37,15 @@ router.get('/projects/:id(\\d+)', async (req, res, next) => {
     } catch (e) { next(e); }
 });
 
+// 경력 상세 (공개 — 상세페이지용)
+router.get('/careers/:id(\\d+)', async (req, res, next) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM careers WHERE id = $1', [req.params.id]);
+        if (!rows.length) return res.status(404).json({ error: '없는 경력' });
+        res.json(rows[0]);
+    } catch (e) { next(e); }
+});
+
 // ─── 인증 ───
 router.get('/login-config', loginConfig);
 router.post('/login', login);
@@ -71,14 +80,14 @@ router.put('/projects/reorder', (req, res, next) => reorder('projects', req.body
 // ─── 세부경력 CRUD ───
 router.post('/careers', async (req, res, next) => {
     try {
-        const { year, title, featured = false } = req.body;
+        const { year, title, featured = false, content = '', images = [] } = req.body;
         if (!Number.isInteger(year) || !title) return res.status(400).json({ error: 'year(정수), title 필수' });
         // 같은 연도 맨 뒤에 추가
         const { rows } = await pool.query(
-            `INSERT INTO careers (year, title, featured, sort_order)
-             VALUES ($1,$2,$3, (SELECT COALESCE(MAX(sort_order)+1, 0) FROM careers WHERE year=$1))
+            `INSERT INTO careers (year, title, featured, content, images, sort_order)
+             VALUES ($1,$2,$3,$4,$5, (SELECT COALESCE(MAX(sort_order)+1, 0) FROM careers WHERE year=$1))
              RETURNING *`,
-            [year, title, !!featured]
+            [year, title, !!featured, content, images]
         );
         res.status(201).json(rows[0]);
     } catch (e) { next(e); }
@@ -86,15 +95,18 @@ router.post('/careers', async (req, res, next) => {
 
 router.put('/careers/:id', async (req, res, next) => {
     try {
-        const { year, title, featured, sort_order } = req.body;
+        const { year, title, featured, sort_order, content, images } = req.body;
         const { rows } = await pool.query(
             `UPDATE careers SET
                 year = COALESCE($1, year),
                 title = COALESCE($2, title),
                 featured = COALESCE($3, featured),
-                sort_order = COALESCE($4, sort_order)
-             WHERE id = $5 RETURNING *`,
-            [year ?? null, title ?? null, featured ?? null, sort_order ?? null, req.params.id]
+                sort_order = COALESCE($4, sort_order),
+                content = COALESCE($5, content),
+                images = COALESCE($6, images)
+             WHERE id = $7 RETURNING *`,
+            [year ?? null, title ?? null, featured ?? null, sort_order ?? null,
+             content ?? null, images ?? null, req.params.id]
         );
         if (!rows.length) return res.status(404).json({ error: '없는 항목' });
         res.json(rows[0]);
