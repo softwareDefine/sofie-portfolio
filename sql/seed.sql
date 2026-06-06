@@ -100,3 +100,11 @@ INSERT INTO settings (key, value) VALUES
     ('about_email',    'juho0601@naver.com'),
     ('about_rows',     '[{"label":"이름","value":"이주호"},{"label":"출생","value":"2006년"},{"label":"학력","value":"現 성균관대학교 소프트웨어학과 25학번 (3.74/4.5)\n前 선린인터넷고등학교 소프트웨어과 117기 (전교 3등)"},{"label":"대표경력","value":"現 AI·SW마에스트로 17기 팀장\n前 삼성SW히어로즈 2018~2019\n前 선린인터넷고 서버전공동아리 AnA 13기 부장\n한국정보올림피아드 4회 수상\n삼성주소창 대회 장려상\nDDP, 킨텍스 대표 전시 경험\n[백준 다이아5 : yangpyeong ↗](https://solved.ac/profile/yangpyeong)"},{"label":"자격증","value":"COS Pro C++ 1급\n네트워크관리사 1급 / 2급\n리눅스마스터 2급\n정보처리기능사"},{"label":"포지션","value":"백엔드 · 인프라 · PM · AI/ML"}]')
 ON CONFLICT (key) DO NOTHING;
+
+-- 히어로 / 배경 영상 / 기술 스택
+INSERT INTO settings (key, value) VALUES
+    ('hero_title',  'SW 공학자 이주호'),
+    ('hero_desc',   'SW로 세상의 문제를 해결하는 꿈'),
+    ('hero_videos', '["clip1.mp4","clip2.mp4","clip3.mp4","clip4.mp4"]'),
+    ('skills_rows', '[["⚙️ C/C++","⚡ JS","🐍 Python","🌐 Django"],["🚀 Express","☁️ AWS","📦 Docker","🐧 Linux"],["📡 MySQL","🍃 MongoDB","📊 Seaborn","🔌 Network"]]')
+ON CONFLICT (key) DO NOTHING;

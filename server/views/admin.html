@@ -149,6 +149,7 @@ button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight
         <button class="tab active" data-tab="careers">세부경력</button>
         <button class="tab" data-tab="projects">프로젝트</button>
         <button class="tab" data-tab="about">약력</button>
+        <button class="tab" data-tab="site">사이트</button>
         <button class="tab" data-tab="stats">스탯</button>
     </div>
 
@@ -187,6 +188,26 @@ button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight
                 <button class="btn-ghost btn-sm" style="margin-top:8px" onclick="addAboutRow()">+ 항목 추가</button>
             </div>
             <div><button class="btn-pri" onclick="saveAbout()">저장</button></div>
+        </div>
+    </div>
+
+    <!-- SITE (히어로/배경영상/기술스택) -->
+    <div id="tab-site" class="hidden">
+        <div style="max-width:640px;display:flex;flex-direction:column;gap:14px">
+            <div class="field" style="margin:0"><label>히어로 제목</label><input type="text" id="s_heroTitle"></div>
+            <div class="field" style="margin:0"><label>히어로 설명</label><input type="text" id="s_heroDesc"></div>
+            <div class="field" style="margin:0">
+                <label>배경 동영상 (위에서부터 순서대로 순환 재생)</label>
+                <div id="s_videoList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
+                <label class="upload-btn" for="s_video">&#127916; 동영상 업로드</label>
+                <input type="file" id="s_video" accept="video/mp4,video/webm,video/quicktime" multiple class="file-hidden">
+                <span id="s_videoBusy" class="hidden" style="font-size:.7rem;color:#7eb8ff;margin-left:8px">업로드 중...</span>
+            </div>
+            <div class="field" style="margin:0">
+                <label>기술 스택 — 한 줄이 마키 한 줄, 항목은 쉼표로 구분 ("이모지 이름" 형식)</label>
+                <textarea id="s_skills" rows="5" placeholder="⚙️ C/C++, ⚡ JS, 🐍 Python&#10;🚀 Express, ☁️ AWS"></textarea>
+            </div>
+            <div><button class="btn-pri" onclick="saveSite()">저장</button></div>
         </div>
     </div>
 
@@ -362,14 +383,14 @@ document.getElementById('logoutBtn').onclick=async()=>{await api('/logout',{meth
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
     t.classList.add('active');
-    ['careers','projects','about','stats'].forEach(n=>document.getElementById('tab-'+n).classList.toggle('hidden',n!==t.dataset.tab));
+    ['careers','projects','about','site','stats'].forEach(n=>document.getElementById('tab-'+n).classList.toggle('hidden',n!==t.dataset.tab));
 });
 
 /* ─── data ─── */
 async function loadAll(){
     const data=await fetch('/api/content').then(r=>r.json());
     careers=data.careers;projects=data.projects;settings=data.settings;
-    renderCareers();renderProjects();renderStats();renderAboutAdmin();
+    renderCareers();renderProjects();renderStats();renderAboutAdmin();renderSiteAdmin();
 }
 
 /* ─── drag & drop 정렬 ─── */
@@ -642,6 +663,64 @@ async function saveAbout(){
         about_phone:document.getElementById('a_phone').value.trim(),
         about_email:document.getElementById('a_email').value.trim(),
         about_rows:JSON.stringify(aboutRows.filter(r=>r.label.trim()||String(r.value).trim())),
+    };
+    try{await api('/settings',{method:'PUT',body:JSON.stringify(body)});toast('저장됨');loadAll();}
+    catch(e){toast(e.message);}
+}
+
+/* ─── 사이트 (히어로/배경영상/기술스택) ─── */
+let siteVideos=[];
+function renderSiteAdmin(){
+    document.getElementById('s_heroTitle').value=settings.hero_title||'';
+    document.getElementById('s_heroDesc').value=settings.hero_desc||'';
+    try{siteVideos=JSON.parse(settings.hero_videos||'[]');}catch(e){siteVideos=[];}
+    renderVideoList();
+    let rows=[];
+    try{rows=JSON.parse(settings.skills_rows||'[]');}catch(e){}
+    document.getElementById('s_skills').value=rows.map(r=>r.join(', ')).join('\n');
+}
+function renderVideoList(){
+    document.getElementById('s_videoList').innerHTML=siteVideos.map((u,i)=>
+        '<div class="row" style="margin:0">'
+        +'<span style="font-size:.72rem;color:rgba(255,255,255,.3)">'+(i+1)+'</span>'
+        +'<div class="grow"><div class="title" style="font-size:.78rem">'+esc(u)+'</div></div>'
+        +(i>0?'<button class="btn-ghost btn-sm" onclick="moveVideo('+i+',-1)">▲</button>':'')
+        +(i<siteVideos.length-1?'<button class="btn-ghost btn-sm" onclick="moveVideo('+i+',1)">▼</button>':'')
+        +'<button class="btn-danger btn-sm" onclick="siteVideos.splice('+i+',1);renderVideoList()">삭제</button>'
+        +'</div>'
+    ).join('')||'<div style="font-size:.72rem;color:rgba(255,255,255,.25)">영상 없음 — 업로드하면 추가됨</div>';
+}
+function moveVideo(i,d){
+    const t=siteVideos[i];siteVideos[i]=siteVideos[i+d];siteVideos[i+d]=t;
+    renderVideoList();
+}
+document.getElementById('s_video').addEventListener('change',async e=>{
+    const files=[...e.target.files];
+    if(!files.length)return;
+    const busy=document.getElementById('s_videoBusy');
+    busy.classList.remove('hidden');
+    for(const file of files){
+        const fd=new FormData();fd.append('image',file);
+        try{
+            const res=await fetch('/api/upload',{method:'POST',body:fd});
+            const data=await res.json();
+            if(!res.ok)throw new Error(data.error||'업로드 실패');
+            siteVideos.push(data.url);
+        }catch(err){toast(file.name+': '+err.message);}
+    }
+    busy.classList.add('hidden');
+    renderVideoList();
+    toast('업로드 완료 — 저장을 눌러야 반영돼');
+    e.target.value='';
+});
+async function saveSite(){
+    const rows=document.getElementById('s_skills').value
+        .split('\n').map(line=>line.split(',').map(s=>s.trim()).filter(Boolean)).filter(r=>r.length);
+    const body={
+        hero_title:document.getElementById('s_heroTitle').value.trim(),
+        hero_desc:document.getElementById('s_heroDesc').value.trim(),
+        hero_videos:JSON.stringify(siteVideos),
+        skills_rows:JSON.stringify(rows),
     };
     try{await api('/settings',{method:'PUT',body:JSON.stringify(body)});toast('저장됨');loadAll();}
     catch(e){toast(e.message);}

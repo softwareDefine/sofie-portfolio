@@ -14,8 +14,10 @@ router.get('/content', async (req, res, next) => {
         const [careers, projects, settings] = await Promise.all([
             pool.query('SELECT * FROM careers ORDER BY year DESC, sort_order, id'),
             pool.query('SELECT * FROM projects ORDER BY sort_order, id'),
-            // stat_*/about_* 만 공개 (자격증명 등 내부 설정 노출 금지)
-            pool.query(`SELECT key, value FROM settings WHERE key LIKE 'stat\\_%' OR key LIKE 'about\\_%'`),
+            // stat_/about_/hero_/skills_ 만 공개 (자격증명 등 내부 설정 노출 금지)
+            pool.query(`SELECT key, value FROM settings
+                        WHERE key LIKE 'stat\\_%' OR key LIKE 'about\\_%'
+                           OR key LIKE 'hero\\_%' OR key LIKE 'skills\\_%'`),
         ]);
         res.json({
             careers: careers.rows,
@@ -177,8 +179,9 @@ router.delete('/projects/:id', async (req, res, next) => {
 // ─── 스탯 (settings) ───
 router.put('/settings', async (req, res, next) => {
     try {
-        // stat_*/about_* 키만 수정 허용 (자격증명 덮어쓰기 방지)
-        const entries = Object.entries(req.body || {}).filter(([k]) => k.startsWith('stat_') || k.startsWith('about_'));
+        // stat_/about_/hero_/skills_ 키만 수정 허용 (자격증명 덮어쓰기 방지)
+        const entries = Object.entries(req.body || {}).filter(([k]) =>
+            k.startsWith('stat_') || k.startsWith('about_') || k.startsWith('hero_') || k.startsWith('skills_'));
         for (const [key, value] of entries) {
             await pool.query(
                 `INSERT INTO settings (key, value) VALUES ($1,$2)
@@ -199,10 +202,11 @@ const upload = multer({
             cb(null, crypto.randomBytes(8).toString('hex') + ext);
         },
     }),
-    limits: { fileSize: 10 * 1024 * 1024 },
+    limits: { fileSize: 100 * 1024 * 1024 }, // 배경 영상 포함이라 넉넉히
     fileFilter: (req, file, cb) => {
-        const ok = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'].includes(path.extname(file.originalname).toLowerCase());
-        cb(ok ? null : new Error('이미지 파일만 업로드 가능'), ok);
+        const ok = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.mp4', '.webm', '.mov']
+            .includes(path.extname(file.originalname).toLowerCase());
+        cb(ok ? null : new Error('이미지/동영상 파일만 업로드 가능'), ok);
     },
 });
 

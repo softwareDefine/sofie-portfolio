@@ -583,8 +583,8 @@
     <div class="logo"><img src="소피로고.svg" alt="sofie" style="height: 41px;"></div>
     <div class="hero-content">
         <div class="hero-left reveal">
-            <h1>SW 공학자 이주호</h1>
-            <p class="desc">SW로 세상의 문제를 해결하는 꿈</p>
+            <h1 id="heroTitle">SW 공학자 이주호</h1>
+            <p class="desc" id="heroDesc">SW로 세상의 문제를 해결하는 꿈</p>
             <a href="#exp" class="cta">경력 보러 가기 →</a>
         </div>
         <div class="hero-right reveal">
@@ -634,21 +634,7 @@
 <section class="sec" id="skills">
     <div class="sec-label reveal">기술 역량</div>
     <h2 class="sec-h reveal">기술 스택</h2>
-    <div class="marquee-wrap reveal">
-        <div class="marquee-track">
-            <span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span><span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span><span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span><span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span><span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span><span class="skt">&#9881; C/C++</span><span class="skt">&#9889; JS</span><span class="skt">&#128013; Python</span><span class="skt">&#127760; Django</span>
-        </div>
-    </div>
-    <div class="marquee-wrap reveal">
-        <div class="marquee-track marquee-reverse">
-            <span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span><span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span><span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span><span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span><span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span><span class="skt">&#128640; Express</span><span class="skt">&#9729; AWS</span><span class="skt">&#128230; Docker</span><span class="skt">&#128039; Linux</span>
-        </div>
-    </div>
-    <div class="marquee-wrap reveal">
-        <div class="marquee-track">
-            <span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span><span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span><span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span><span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span><span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span><span class="skt">&#128225; MySQL</span><span class="skt">&#127811; MongoDB</span><span class="skt">&#128202; Seaborn</span><span class="skt">&#128268; Network</span>
-        </div>
-    </div>
+    <div id="skillsWrap"></div>
 </section>
 
 <div class="sep"><hr></div>
@@ -1034,40 +1020,69 @@ function renderStats(settings){
     startCounts();
 }
 
+function renderHero(s){
+    if(s.hero_title)document.getElementById('heroTitle').textContent=s.hero_title;
+    if(s.hero_desc)document.getElementById('heroDesc').textContent=s.hero_desc;
+    let clips=[];
+    try{clips=JSON.parse(s.hero_videos||'[]');}catch(e){}
+    startVideos(clips.length?clips:defaultClips);
+}
+
+function renderSkills(s){
+    let rows=[];
+    try{rows=JSON.parse(s.skills_rows||'[]');}catch(e){}
+    if(!rows.length)return;
+    const wrap=document.getElementById('skillsWrap');
+    wrap.innerHTML=rows.map((items,i)=>{
+        if(!items.length)return '';
+        const seq=Array(6).fill(items).flat(); // 마키 루프용 반복
+        return '<div class="marquee-wrap reveal v"><div class="marquee-track'+(i%2?' marquee-reverse':'')+'">'
+            +seq.map(t=>'<span class="skt">'+esc(t)+'</span>').join('')+'</div></div>';
+    }).join('');
+}
+
 (async function loadContent(){
     try{
         const res=await fetch('/api/content');
         if(!res.ok)throw new Error('HTTP '+res.status);
         const data=await res.json();
         renderStats(data.settings);
+        renderHero(data.settings);
+        renderSkills(data.settings);
         renderAbout(data.settings);
         renderTimeline(data.careers);
         renderProjects(data.projects);
     }catch(e){
         console.error('콘텐츠 로드 실패:',e);
         startCounts();
+        startVideos(defaultClips);
     }
 })();
 
-const clips=['clip1.mp4','clip2.mp4','clip3.mp4','clip4.mp4'];
-let ci=0;
-const va=document.getElementById('bgA');
-const vb=document.getElementById('bgB');
-let current=va, next=vb;
+const defaultClips=['clip1.mp4','clip2.mp4','clip3.mp4','clip4.mp4'];
+let videoStarted=false;
+function startVideos(clips){
+    if(videoStarted||!clips.length)return;
+    videoStarted=true;
+    let ci=0;
+    const va=document.getElementById('bgA');
+    const vb=document.getElementById('bgB');
+    let current=va, next=vb;
 
-function playNext(){
-    next.src=clips[ci];
-    next.play();
-    next.classList.add('active');
-    current.classList.remove('active');
+    function playNext(){
+        next.src=clips[ci];
+        next.play();
+        next.classList.add('active');
+        current.classList.remove('active');
+        ci=(ci+1)%clips.length;
+        const tmp=current; current=next; next=tmp;
+    }
+
+    current.addEventListener('ended',playNext);
+    next.addEventListener('ended',playNext);
+    va.src=clips[ci]; va.play(); va.classList.add('active');
     ci=(ci+1)%clips.length;
-    const tmp=current; current=next; next=tmp;
 }
-
-current.addEventListener('ended',playNext);
-next.addEventListener('ended',playNext);
-va.src=clips[ci]; va.play(); va.classList.add('active');
-ci=(ci+1)%clips.length;
 
 const indLinks=document.querySelectorAll('.page-ind a');
 const sections=['hero','about','skills','exp','projects'];
