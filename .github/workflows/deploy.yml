@@ -20,9 +20,10 @@ jobs:
           cd /Users/juholee/servers/sofie-portfolio
           docker compose up -d --build
 
-      - name: Reload nginx config
+      - name: Health check
         run: |
-          docker exec sofie-portfolio nginx -t && docker exec sofie-portfolio nginx -s reload
+          sleep 5
+          curl -sf http://localhost:${PORT:-8080}/api/content > /dev/null && echo "OK"
 
       - name: Show running containers
         run: docker ps --filter "name=sofie-portfolio" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"

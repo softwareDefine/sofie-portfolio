@@ -3,3 +3,6 @@ ffmpeg/
 screenshot-hero.png
 screenshot-full.png
 screenshot.js
+.env
+public/uploads/*
+!public/uploads/.gitkeep

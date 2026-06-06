@@ -1,0 +1,31 @@
+services:
+  app:
+    build: .
+    container_name: sofie-portfolio
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:3000"
+    environment:
+      # 외부 DB 쓰려면 .env에서 DATABASE_URL만 바꾸면 됨
+      DATABASE_URL: ${DATABASE_URL:-postgres://sofie:sofie@db:5432/sofie_portfolio}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme}
+      SESSION_SECRET: ${SESSION_SECRET:-}
+    volumes:
+      - uploads:/app/public/uploads
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17-alpine
+    container_name: sofie-portfolio-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sofie
+      POSTGRES_PASSWORD: sofie
+      POSTGRES_DB: sofie_portfolio
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+  uploads:

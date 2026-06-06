@@ -1,0 +1,19 @@
+{
+  "name": "sofie-portfolio",
+  "version": "2.0.0",
+  "description": "sofie portfolio site with admin",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "cookie-session": "^2.1.0",
+    "express": "^4.21.2",
+    "multer": "^2.0.2",
+    "pg": "^8.13.1"
+  }
+}

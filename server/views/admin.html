@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sofie admin</title>
+<link href="https://hangeul.pstatic.net/hangeul_static/css/NanumSquare Neo.css" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'NanumSquare Neo',-apple-system,sans-serif;background:#0b0f1a;color:#fff;min-height:100vh;-webkit-font-smoothing:antialiased}
+a{color:#7eb8ff}
+.wrap{max-width:980px;margin:0 auto;padding:40px 24px}
+h1{font-size:1.4rem;font-weight:700;margin-bottom:4px}
+.sub{font-size:.75rem;color:rgba(255,255,255,.3);margin-bottom:28px}
+
+/* login */
+.login-box{max-width:340px;margin:18vh auto 0;display:flex;flex-direction:column;gap:10px}
+.login-box img{height:36px;margin:0 auto 18px;display:block}
+
+/* common controls */
+input,select,textarea,button{font-family:inherit;font-size:.82rem;color:#fff;outline:none}
+input,textarea{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;width:100%;transition:border-color .2s}
+input:focus,textarea:focus{border-color:rgba(100,180,255,.4)}
+input[type=checkbox]{width:auto;accent-color:#7eb8ff;cursor:pointer}
+input[type=number]{width:90px}
+button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight:600;transition:all .2s}
+.btn-pri{background:#fff;color:#111}
+.btn-pri:hover{background:rgba(255,255,255,.85)}
+.btn-ghost{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.08)}
+.btn-ghost:hover{background:rgba(255,255,255,.12)}
+.btn-danger{background:rgba(255,80,80,.12);color:#ff7b7b}
+.btn-danger:hover{background:rgba(255,80,80,.25)}
+.btn-sm{padding:5px 10px;font-size:.72rem;border-radius:6px}
+
+/* tabs */
+.tabs{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+.tab{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.5);border-radius:100px;padding:8px 20px;font-size:.8rem}
+.tab.active{background:#fff;color:#111;font-weight:700}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start}
+
+/* list rows */
+.row{display:flex;gap:8px;align-items:center;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);margin-bottom:6px}
+.row:hover{background:rgba(255,255,255,.05)}
+.row.dragging{opacity:.35;border-color:rgba(100,180,255,.5)}
+.handle{cursor:grab;color:rgba(255,255,255,.25);font-size:.9rem;padding:4px 6px;user-select:none;letter-spacing:-2px}
+.handle:hover{color:rgba(255,255,255,.6)}
+.handle:active{cursor:grabbing}
+.row .grow{flex:1;min-width:0}
+.row .title{font-size:.85rem;color:rgba(255,255,255,.85);word-break:break-all}
+.row .meta{font-size:.68rem;color:rgba(255,255,255,.3);margin-top:2px}
+.badge{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(255,217,61,.12);color:#ffd93d;white-space:nowrap}
+.yr-head{font-size:1rem;font-weight:700;color:#7eb8ff;margin:22px 0 8px}
+.thumb{width:54px;height:38px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.08)}
+.thumb-ph{width:54px;height:38px;border-radius:6px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:rgba(255,255,255,.2)}
+.tags span{font-size:.6rem;padding:2px 7px;border-radius:4px;background:rgba(100,180,255,.08);color:#7eb8ff;margin-right:3px}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:50;overflow-y:auto;padding:8vh 16px}
+.modal-bg.open{display:flex}
+.modal{background:#11182a;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:26px;width:100%;max-width:460px}
+.modal h2{font-size:1rem;margin-bottom:18px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.7rem;color:rgba(255,255,255,.4);margin-bottom:5px}
+.field .inline{display:flex;align-items:center;gap:8px}
+.modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* stats */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:560px}
+.stat-card{padding:18px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05)}
+.stat-card label{display:block;font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:8px}
+.stat-card input{font-size:1.4rem;font-weight:800;width:100%}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c2840;border:1px solid rgba(100,180,255,.3);border-radius:10px;padding:10px 22px;font-size:.8rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99}
+.toast.show{opacity:1}
+.hidden{display:none}
+@media(max-width:640px){.stats-grid{grid-template-columns:1fr}.row{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginView" class="hidden">
+    <div class="login-box">
+        <img src="소피로고.svg" alt="sofie">
+        <input type="password" id="pw" placeholder="비밀번호" autocomplete="current-password">
+        <input type="text" id="otp" placeholder="OTP 6자리" inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code" class="hidden" style="text-align:center;letter-spacing:.4em">
+        <button class="btn-pri" id="loginBtn">로그인</button>
+        <p id="loginErr" style="font-size:.72rem;color:#ff7b7b;text-align:center"></p>
+    </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adminView" class="wrap hidden">
+    <div class="topbar">
+        <div>
+            <h1><img src="소피로고.svg" alt="sofie" style="height:30px;vertical-align:-6px"> admin</h1>
+            <p class="sub">포트폴리오 콘텐츠 관리 · <a href="/" target="_blank">사이트 보기 ↗</a></p>
+        </div>
+        <button class="btn-ghost btn-sm" id="logoutBtn">로그아웃</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" data-tab="careers">세부경력</button>
+        <button class="tab" data-tab="projects">프로젝트</button>
+        <button class="tab" data-tab="stats">스탯</button>
+    </div>
+
+    <!-- CAREERS -->
+    <div id="tab-careers">
+        <button class="btn-pri" onclick="openCareerModal()">+ 경력 추가</button>
+        <div id="careerList"></div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div id="tab-projects" class="hidden">
+        <button class="btn-pri" onclick="openProjectModal()">+ 프로젝트 추가</button>
+        <div id="projectList" style="margin-top:16px"></div>
+    </div>
+
+    <!-- STATS -->
+    <div id="tab-stats" class="hidden">
+        <div class="stats-grid">
+            <div class="stat-card"><label>경력을 시작한지 (년)</label><input type="number" id="stat_years"></div>
+            <div class="stat-card"><label>프로젝트의 수 (개)</label><input type="number" id="stat_projects"></div>
+            <div class="stat-card"><label>코딩 대외활동 (개)</label><input type="number" id="stat_activities"></div>
+        </div>
+        <button class="btn-pri" style="margin-top:14px" onclick="saveStats()">저장</button>
+    </div>
+</div>
+
+<!-- CAREER MODAL -->
+<div class="modal-bg" id="careerModal">
+    <div class="modal">
+        <h2 id="careerModalTitle">경력 추가</h2>
+        <div class="field"><label>연도</label><input type="number" id="c_year"></div>
+        <div class="field"><label>내용</label><input type="text" id="c_title"></div>
+        <div class="field"><div class="inline"><input type="checkbox" id="c_featured"><label for="c_featured" style="margin:0;cursor:pointer">핵심경력에 표시 (메인에서 굵게 강조)</label></div></div>
+        <div class="actions">
+            <button class="btn-ghost" onclick="closeModal('careerModal')">취소</button>
+            <button class="btn-pri" id="careerSaveBtn">저장</button>
+        </div>
+    </div>
+</div>
+
+<!-- PROJECT MODAL -->
+<div class="modal-bg" id="projectModal">
+    <div class="modal">
+        <h2 id="projectModalTitle">프로젝트 추가</h2>
+        <div class="field"><label>연도</label><input type="number" id="p_year"></div>
+        <div class="field"><label>제목</label><input type="text" id="p_title"></div>
+        <div class="field"><label>설명</label><textarea id="p_desc" rows="2"></textarea></div>
+        <div class="field"><label>태그 (쉼표로 구분)</label><input type="text" id="p_tags" placeholder="Python, AI/ML, 팀장"></div>
+        <div class="field"><label>링크 URL (선택)</label><input type="text" id="p_link" placeholder="https://..."></div>
+        <div class="field">
+            <label>썸네일 이미지</label>
+            <div class="inline">
+                <img id="p_preview" class="thumb hidden" alt="">
+                <input type="file" id="p_image" accept="image/*" style="border:none;background:none;padding:0">
+                <button class="btn-ghost btn-sm hidden" id="p_imgRemove" onclick="removeImage()">이미지 제거</button>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn-ghost" onclick="closeModal('projectModal')">취소</button>
+            <button class="btn-pri" id="projectSaveBtn">저장</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let careers=[], projects=[], settings={};
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}
+
+async function api(path,opts={}){
+    const res=await fetch('/api'+path,{headers:{'Content-Type':'application/json'},...opts});
+    if(res.status===401){showLogin();throw new Error('unauthorized');}
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(data.error||('HTTP '+res.status));
+    return data;
+}
+
+/* ─── auth ─── */
+function showLogin(){document.getElementById('loginView').classList.remove('hidden');document.getElementById('adminView').classList.add('hidden');}
+function showAdmin(){document.getElementById('loginView').classList.add('hidden');document.getElementById('adminView').classList.remove('hidden');}
+
+document.getElementById('loginBtn').onclick=doLogin;
+document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('otp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+// OTP 설정 여부에 따라 입력칸 표시
+fetch('/api/login-config').then(r=>r.json()).then(c=>{
+    if(c.otpRequired)document.getElementById('otp').classList.remove('hidden');
+}).catch(()=>{});
+async function doLogin(){
+    try{
+        await api('/login',{method:'POST',body:JSON.stringify({
+            password:document.getElementById('pw').value,
+            otp:document.getElementById('otp').value.trim(),
+        })});
+        document.getElementById('loginErr').textContent='';
+        document.getElementById('otp').value='';
+        showAdmin();loadAll();
+    }catch(e){document.getElementById('loginErr').textContent=e.message;}
+}
+document.getElementById('logoutBtn').onclick=async()=>{await api('/logout',{method:'POST'});showLogin();};
+
+/* ─── tabs ─── */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    ['careers','projects','stats'].forEach(n=>document.getElementById('tab-'+n).classList.toggle('hidden',n!==t.dataset.tab));
+});
+
+/* ─── data ─── */
+async function loadAll(){
+    const data=await fetch('/api/content').then(r=>r.json());
+    careers=data.careers;projects=data.projects;settings=data.settings;
+    renderCareers();renderProjects();renderStats();
+}
+
+/* ─── drag & drop 정렬 ─── */
+let dragEl=null;
+function attachDrag(group,endpoint){
+    group.querySelectorAll('.row').forEach(row=>{
+        const handle=row.querySelector('.handle');
+        handle.addEventListener('mousedown',()=>row.draggable=true);
+        handle.addEventListener('touchstart',()=>row.draggable=true,{passive:true});
+        row.addEventListener('dragstart',()=>{dragEl=row;row.classList.add('dragging');});
+        row.addEventListener('dragend',async()=>{
+            row.classList.remove('dragging');row.draggable=false;
+            if(!dragEl)return;
+            dragEl=null;
+            const ids=[...group.querySelectorAll('.row')].map(r=>+r.dataset.id);
+            try{await api(endpoint,{method:'PUT',body:JSON.stringify({ids})});toast('순서 저장됨');loadAll();}
+            catch(e){toast(e.message);loadAll();}
+        });
+        row.addEventListener('dragover',e=>{
+            if(!dragEl||dragEl===row||dragEl.parentElement!==row.parentElement)return;
+            e.preventDefault();
+            const rect=row.getBoundingClientRect();
+            const after=(e.clientY-rect.top)>rect.height/2;
+            row.parentElement.insertBefore(dragEl,after?row.nextSibling:row);
+        });
+        row.addEventListener('drop',e=>e.preventDefault());
+    });
+}
+
+/* ─── careers ─── */
+function renderCareers(){
+    const years=[...new Set(careers.map(c=>c.year))].sort((a,b)=>b-a);
+    document.getElementById('careerList').innerHTML=years.map(y=>
+        '<div class="yr-head">'+y+'</div>'
+        +'<div class="drag-group" data-year="'+y+'">'
+        +careers.filter(c=>c.year===y).map(c=>
+            '<div class="row" data-id="'+c.id+'">'
+            +'<span class="handle" title="드래그로 순서 변경">⠿</span>'
+            +'<div class="grow"><div class="title">'+esc(c.title)+'</div></div>'
+            +(c.featured?'<span class="badge">핵심</span>':'')
+            +'<button class="btn-ghost btn-sm" onclick="openCareerModal('+c.id+')">수정</button>'
+            +'<button class="btn-danger btn-sm" onclick="delCareer('+c.id+')">삭제</button>'
+            +'</div>'
+        ).join('')+'</div>'
+    ).join('');
+    document.querySelectorAll('#careerList .drag-group').forEach(g=>attachDrag(g,'/careers/reorder'));
+}
+
+let editingCareer=null;
+function openCareerModal(id){
+    editingCareer=id?careers.find(c=>c.id===id):null;
+    document.getElementById('careerModalTitle').textContent=editingCareer?'경력 수정':'경력 추가';
+    document.getElementById('c_year').value=editingCareer?editingCareer.year:new Date().getFullYear();
+    document.getElementById('c_title').value=editingCareer?editingCareer.title:'';
+    document.getElementById('c_featured').checked=editingCareer?editingCareer.featured:false;
+    document.getElementById('careerModal').classList.add('open');
+}
+document.getElementById('careerSaveBtn').onclick=async()=>{
+    const body={
+        year:parseInt(document.getElementById('c_year').value,10),
+        title:document.getElementById('c_title').value.trim(),
+        featured:document.getElementById('c_featured').checked,
+    };
+    if(!body.title||isNaN(body.year))return toast('연도와 내용을 입력해');
+    try{
+        if(editingCareer)await api('/careers/'+editingCareer.id,{method:'PUT',body:JSON.stringify(body)});
+        else await api('/careers',{method:'POST',body:JSON.stringify(body)});
+        closeModal('careerModal');toast('저장됨');loadAll();
+    }catch(e){toast(e.message);}
+};
+async function delCareer(id){
+    if(!confirm('삭제할까?'))return;
+    try{await api('/careers/'+id,{method:'DELETE'});toast('삭제됨');loadAll();}catch(e){toast(e.message);}
+}
+
+/* ─── projects ─── */
+function renderProjects(){
+    document.getElementById('projectList').innerHTML='<div class="drag-group">'+projects.map(p=>
+        '<div class="row" data-id="'+p.id+'">'
+        +'<span class="handle" title="드래그로 순서 변경">⠿</span>'
+        +(p.image_url?'<img class="thumb" src="'+esc(p.image_url)+'">':'<div class="thumb-ph">no img</div>')
+        +'<div class="grow"><div class="title">['+p.year+'] '+esc(p.title)+'</div>'
+        +'<div class="meta">'+esc(p.description)+'</div>'
+        +'<div class="tags" style="margin-top:4px">'+(p.tags||[]).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div></div>'
+        +'<button class="btn-ghost btn-sm" onclick="openProjectModal('+p.id+')">수정</button>'
+        +'<button class="btn-danger btn-sm" onclick="delProject('+p.id+')">삭제</button>'
+        +'</div>'
+    ).join('')+'</div>';
+    attachDrag(document.querySelector('#projectList .drag-group'),'/projects/reorder');
+}
+
+let editingProject=null, uploadedUrl=undefined;
+function openProjectModal(id){
+    editingProject=id?projects.find(p=>p.id===id):null;
+    uploadedUrl=undefined;
+    document.getElementById('projectModalTitle').textContent=editingProject?'프로젝트 수정':'프로젝트 추가';
+    document.getElementById('p_year').value=editingProject?editingProject.year:new Date().getFullYear();
+    document.getElementById('p_title').value=editingProject?editingProject.title:'';
+    document.getElementById('p_desc').value=editingProject?editingProject.description:'';
+    document.getElementById('p_tags').value=editingProject?(editingProject.tags||[]).join(', '):'';
+    document.getElementById('p_link').value=editingProject?(editingProject.link_url||''):'';
+    document.getElementById('p_image').value='';
+    const prev=document.getElementById('p_preview'), rm=document.getElementById('p_imgRemove');
+    const img=editingProject&&editingProject.image_url;
+    prev.classList.toggle('hidden',!img);rm.classList.toggle('hidden',!img);
+    if(img)prev.src=editingProject.image_url;
+    document.getElementById('projectModal').classList.add('open');
+}
+function removeImage(){
+    uploadedUrl=null;
+    document.getElementById('p_preview').classList.add('hidden');
+    document.getElementById('p_imgRemove').classList.add('hidden');
+    document.getElementById('p_image').value='';
+}
+document.getElementById('p_image').addEventListener('change',async e=>{
+    const file=e.target.files[0];
+    if(!file)return;
+    const fd=new FormData();fd.append('image',file);
+    try{
+        const res=await fetch('/api/upload',{method:'POST',body:fd});
+        const data=await res.json();
+        if(!res.ok)throw new Error(data.error||'업로드 실패');
+        uploadedUrl=data.url;
+        const prev=document.getElementById('p_preview');
+        prev.src=data.url;prev.classList.remove('hidden');
+        document.getElementById('p_imgRemove').classList.remove('hidden');
+        toast('이미지 업로드됨');
+    }catch(err){toast(err.message);}
+});
+document.getElementById('projectSaveBtn').onclick=async()=>{
+    let image_url=editingProject?editingProject.image_url:null;
+    if(uploadedUrl!==undefined)image_url=uploadedUrl; // 새 업로드 or 제거(null)
+    const body={
+        year:parseInt(document.getElementById('p_year').value,10),
+        title:document.getElementById('p_title').value.trim(),
+        description:document.getElementById('p_desc').value.trim(),
+        tags:document.getElementById('p_tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+        link_url:document.getElementById('p_link').value.trim()||null,
+        image_url,
+    };
+    if(!body.title||isNaN(body.year))return toast('연도와 제목을 입력해');
+    try{
+        if(editingProject)await api('/projects/'+editingProject.id,{method:'PUT',body:JSON.stringify(body)});
+        else await api('/projects',{method:'POST',body:JSON.stringify(body)});
+        closeModal('projectModal');toast('저장됨');loadAll();
+    }catch(e){toast(e.message);}
+};
+async function delProject(id){
+    if(!confirm('삭제할까?'))return;
+    try{await api('/projects/'+id,{method:'DELETE'});toast('삭제됨');loadAll();}catch(e){toast(e.message);}
+}
+
+/* ─── stats ─── */
+function renderStats(){
+    ['stat_years','stat_projects','stat_activities'].forEach(k=>{
+        if(settings[k]!==undefined)document.getElementById(k).value=settings[k];
+    });
+}
+async function saveStats(){
+    const body={};
+    ['stat_years','stat_projects','stat_activities'].forEach(k=>body[k]=document.getElementById(k).value);
+    try{await api('/settings',{method:'PUT',body:JSON.stringify(body)});toast('저장됨');}catch(e){toast(e.message);}
+}
+
+/* ─── modal helpers ─── */
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+/* ─── init ─── */
+(async()=>{
+    const me=await fetch('/api/me').then(r=>r.json()).catch(()=>({admin:false}));
+    if(me.admin){showAdmin();loadAll();}
+    else showLogin();
+})();
+</script>
+</body>
+</html>
