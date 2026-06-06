@@ -197,6 +197,11 @@ button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight
             <div class="field" style="margin:0"><label>히어로 제목</label><input type="text" id="s_heroTitle"></div>
             <div class="field" style="margin:0"><label>히어로 설명</label><input type="text" id="s_heroDesc"></div>
             <div class="field" style="margin:0">
+                <label>운영 채널 링크 (히어로·푸터에 표시 — 블로그, GitHub 등)</label>
+                <div id="s_links" style="display:flex;flex-direction:column;gap:8px"></div>
+                <button class="btn-ghost btn-sm" style="margin-top:8px" onclick="addSiteLink()">+ 링크 추가</button>
+            </div>
+            <div class="field" style="margin:0">
                 <label>배경 동영상 (위에서부터 순서대로 순환 재생)</label>
                 <div id="s_videoList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
                 <label class="upload-btn" for="s_video">&#127916; 동영상 업로드</label>
@@ -669,16 +674,28 @@ async function saveAbout(){
 }
 
 /* ─── 사이트 (히어로/배경영상/기술스택) ─── */
-let siteVideos=[];
+let siteVideos=[], siteLinks=[];
 function renderSiteAdmin(){
     document.getElementById('s_heroTitle').value=settings.hero_title||'';
     document.getElementById('s_heroDesc').value=settings.hero_desc||'';
     try{siteVideos=JSON.parse(settings.hero_videos||'[]');}catch(e){siteVideos=[];}
     renderVideoList();
+    try{siteLinks=JSON.parse(settings.hero_links||'[]');}catch(e){siteLinks=[];}
+    renderSiteLinks();
     let rows=[];
     try{rows=JSON.parse(settings.skills_rows||'[]');}catch(e){}
     document.getElementById('s_skills').value=rows.map(r=>r.join(', ')).join('\n');
 }
+function renderSiteLinks(){
+    document.getElementById('s_links').innerHTML=siteLinks.map((l,i)=>
+        '<div style="display:flex;gap:8px;align-items:center">'
+        +'<input type="text" value="'+esc(l.label)+'" onchange="siteLinks['+i+'].label=this.value" style="width:140px;flex-shrink:0" placeholder="✍ 블로그">'
+        +'<input type="text" value="'+esc(l.url)+'" onchange="siteLinks['+i+'].url=this.value" style="flex:1" placeholder="https://...">'
+        +'<button class="btn-danger btn-sm" style="flex-shrink:0" onclick="siteLinks.splice('+i+',1);renderSiteLinks()">✕</button>'
+        +'</div>'
+    ).join('');
+}
+function addSiteLink(){siteLinks.push({label:'',url:''});renderSiteLinks();}
 function renderVideoList(){
     document.getElementById('s_videoList').innerHTML=siteVideos.map((u,i)=>
         '<div class="row" style="margin:0">'
@@ -720,6 +737,7 @@ async function saveSite(){
         hero_title:document.getElementById('s_heroTitle').value.trim(),
         hero_desc:document.getElementById('s_heroDesc').value.trim(),
         hero_videos:JSON.stringify(siteVideos),
+        hero_links:JSON.stringify(siteLinks.filter(l=>l.label.trim()&&l.url.trim())),
         skills_rows:JSON.stringify(rows),
     };
     try{await api('/settings',{method:'PUT',body:JSON.stringify(body)});toast('저장됨');loadAll();}

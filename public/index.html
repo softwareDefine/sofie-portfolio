@@ -120,6 +120,20 @@
             background: rgba(255,255,255,0.85);
             transform: translateY(-1px);
         }
+        .hero-links {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+            margin-top: 20px; font-size: 0.78rem;
+        }
+        .hero-links a { color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
+        .hero-links a:hover { color: #7eb8ff; }
+        .hero-links .dot { color: rgba(255,255,255,0.15); user-select: none; }
+        .ft-links {
+            display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px;
+            margin-bottom: 12px; font-size: 0.72rem;
+        }
+        .ft-links a { color: rgba(255,255,255,0.25); text-decoration: none; transition: color 0.2s; }
+        .ft-links a:hover { color: #7eb8ff; }
+        .ft-links .dot { color: rgba(255,255,255,0.1); user-select: none; }
 
         /* RIGHT — STATS */
         .hero-right {
@@ -586,6 +600,7 @@
             <h1 id="heroTitle">SW 공학자 이주호</h1>
             <p class="desc" id="heroDesc">SW로 세상의 문제를 해결하는 꿈</p>
             <a href="#exp" class="cta">경력 보러 가기 →</a>
+            <div class="hero-links" id="heroLinks"></div>
         </div>
         <div class="hero-right reveal">
             <div class="stat">
@@ -664,6 +679,7 @@
 
 <footer>
     <img src="소피로고.svg" alt="sofie">
+    <div class="ft-links" id="footLinks"></div>
     <p>&copy; 2026 sofie. All rights reserved.</p>
 </footer>
 </div><!-- /below-hero -->
@@ -1026,6 +1042,14 @@ function renderHero(s){
     let clips=[];
     try{clips=JSON.parse(s.hero_videos||'[]');}catch(e){}
     startVideos(clips.length?clips:defaultClips);
+    // 운영 채널 링크 (히어로 + 푸터)
+    let links=[];
+    try{links=JSON.parse(s.hero_links||'[]');}catch(e){}
+    const html=links.filter(l=>l.label&&l.url).map(l=>
+        '<a href="'+esc(l.url)+'" target="_blank" rel="noopener">'+esc(l.label)+'</a>'
+    ).join('<span class="dot">·</span>');
+    document.getElementById('heroLinks').innerHTML=html;
+    document.getElementById('footLinks').innerHTML=html;
 }
 
 function renderSkills(s){

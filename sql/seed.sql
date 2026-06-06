@@ -106,5 +106,6 @@ INSERT INTO settings (key, value) VALUES
     ('hero_title',  'SW 공학자 이주호'),
     ('hero_desc',   'SW로 세상의 문제를 해결하는 꿈'),
     ('hero_videos', '["clip1.mp4","clip2.mp4","clip3.mp4","clip4.mp4"]'),
+    ('hero_links',  '[{"label":"⭐ GitHub","url":"https://github.com/softwareDefine"},{"label":"🟦 백준","url":"https://solved.ac/profile/yangpyeong"}]'),
     ('skills_rows', '[["⚙️ C/C++","⚡ JS","🐍 Python","🌐 Django"],["🚀 Express","☁️ AWS","📦 Docker","🐧 Linux"],["📡 MySQL","🍃 MongoDB","📊 Seaborn","🔌 Network"]]')
 ON CONFLICT (key) DO NOTHING;
