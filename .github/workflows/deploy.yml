@@ -1,0 +1,28 @@
+name: Deploy to Mac mini
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, mac-mini]
+    steps:
+      - name: Pull latest code
+        run: |
+          cd /Users/juholee/servers/sofie-portfolio
+          git fetch origin master
+          git reset --hard origin/master
+
+      - name: Rebuild and restart containers
+        run: |
+          cd /Users/juholee/servers/sofie-portfolio
+          docker compose up -d --build
+
+      - name: Reload nginx config
+        run: |
+          docker exec sofie-portfolio nginx -t && docker exec sofie-portfolio nginx -s reload
+
+      - name: Show running containers
+        run: docker ps --filter "name=sofie-portfolio" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
