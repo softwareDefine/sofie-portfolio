@@ -1167,7 +1167,7 @@ function startVideos(clips){
 const indLinks=document.querySelectorAll('.page-ind a');
 const sections=['hero','about','skills','exp','projects'];
 const indEl=document.querySelector('.page-ind');
-let hideTimer=null, snapTimer=null;
+let hideTimer=null;
 window.addEventListener('scroll',()=>{
     let curIdx=0;
     sections.forEach((id,i)=>{
@@ -1184,11 +1184,6 @@ window.addEventListener('scroll',()=>{
     indEl.classList.add('show');
     clearTimeout(hideTimer);
     hideTimer=setTimeout(()=>indEl.classList.remove('show'),1500);
-    clearTimeout(snapTimer);
-    snapTimer=setTimeout(()=>{
-        const el=document.getElementById(sections[curIdx]);
-        if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
-    },300);
 });
 </script>
 </body>
