@@ -35,6 +35,9 @@ services:
       SESSION_SECRET: ${SESSION_SECRET:-}
       OTP_SECRET: ${OTP_SECRET:-}
       TRUST_PROXY: ${TRUST_PROXY:-1}
+      # 운영 콘솔이 경력/프로젝트를 쓰기 위해 쓰는 내부 토큰
+      SERVICE_TOKEN: ${SERVICE_TOKEN:-}
+      CONSOLE_URL: ${CONSOLE_URL:-https://console.sofie.co.kr/}
       RESET_EMAIL: ${RESET_EMAIL:-}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}

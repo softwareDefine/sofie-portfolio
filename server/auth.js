@@ -127,8 +127,21 @@ async function resetConfirm(req, res, next) {
     } catch (e) { next(e); }
 }
 
+// 내부 서비스(운영 콘솔)가 세션 없이 쓰기 위한 경로.
+// SERVICE_TOKEN 이 설정된 경우에만 열리고, 값은 상수 시간으로 비교한다.
+// 이 라우터는 이미 requireInternal 뒤에 있으므로 도커 내부망에서만 닿는다.
+function hasServiceToken(req) {
+    const expected = process.env.SERVICE_TOKEN;
+    if (!expected) return false;
+    const got = req.get('x-service-token') || '';
+    const a = Buffer.from(got), b = Buffer.from(expected);
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+}
+
 function requireAdmin(req, res, next) {
     if (req.session && req.session.admin) return next();
+    if (hasServiceToken(req)) return next();
     res.status(401).json({ error: '로그인이 필요합니다.' });
 }
 
