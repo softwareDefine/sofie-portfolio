@@ -7,6 +7,9 @@ const { login, logout, loginConfig, requireAdmin, requireInternal, resetRequest,
 
 const router = express.Router();
 
+// 코딩을 시작한 해. 연차는 여기서부터 센다.
+const CAREER_START_YEAR = Number(process.env.CAREER_START_YEAR || 2013);
+
 // ─── 공개 API ───
 // 메인 페이지가 한 번에 받아가는 전체 콘텐츠
 router.get('/content', async (req, res, next) => {
@@ -19,10 +22,19 @@ router.get('/content', async (req, res, next) => {
                         WHERE key LIKE 'stat\\_%' OR key LIKE 'about\\_%'
                            OR key LIKE 'hero\\_%' OR key LIKE 'skills\\_%'`),
         ]);
+        // 스탯은 저장된 숫자가 아니라 데이터에서 뽑는다. 손으로 맞추면 어긋난다.
+        const derived = {
+            stat_years: String(new Date().getFullYear() - CAREER_START_YEAR),
+            stat_projects: String(projects.rows.length),
+            stat_activities: String(careers.rows.length),
+        };
         res.json({
             careers: careers.rows,
             projects: projects.rows,
-            settings: Object.fromEntries(settings.rows.map(r => [r.key, r.value])),
+            settings: Object.assign(
+                Object.fromEntries(settings.rows.map(r => [r.key, r.value])),
+                derived
+            ),
         });
     } catch (e) { next(e); }
 });
@@ -180,8 +192,10 @@ router.delete('/projects/:id', async (req, res, next) => {
 router.put('/settings', async (req, res, next) => {
     try {
         // stat_/about_/hero_/skills_ 키만 수정 허용 (자격증명 덮어쓰기 방지)
+        // stat_ 는 이제 /content 에서 계산해 내려주므로 저장을 받지 않는다.
+        // (받아두면 DB 에는 남고 화면에는 안 나오는 유령 값이 생긴다)
         const entries = Object.entries(req.body || {}).filter(([k]) =>
-            k.startsWith('stat_') || k.startsWith('about_') || k.startsWith('hero_') || k.startsWith('skills_'));
+            k.startsWith('about_') || k.startsWith('hero_') || k.startsWith('skills_'));
         for (const [key, value] of entries) {
             await pool.query(
                 `INSERT INTO settings (key, value) VALUES ($1,$2)
