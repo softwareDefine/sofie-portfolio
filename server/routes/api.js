@@ -39,10 +39,9 @@ router.get('/content', async (req, res, next) => {
     } catch (e) { next(e); }
 });
 
-// 이하 전부 내부망 전용 (로그인 포함)
-router.use(requireInternal);
-
 // 프로젝트 상세 (공개 — 상세페이지용)
+// 원래 아래 requireInternal 뒤에 있었는데, 프록시 체인에서 접속자 IP 가 사라져 모두가
+// 내부로 보였기 때문에 우연히 열려 있었다. 실제 IP 가 들어오면 403 이 되므로 앞으로 뺐다.
 router.get('/projects/:id(\\d+)', async (req, res, next) => {
     try {
         const { rows } = await pool.query('SELECT * FROM projects WHERE id = $1', [req.params.id]);
@@ -59,6 +58,9 @@ router.get('/careers/:id(\\d+)', async (req, res, next) => {
         res.json(rows[0]);
     } catch (e) { next(e); }
 });
+
+// 이하 전부 내부망 전용 (로그인 포함)
+router.use(requireInternal);
 
 // ─── 인증 ───
 router.get('/login-config', loginConfig);

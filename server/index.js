@@ -12,7 +12,9 @@ const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
 // 리버스 프록시(nginx, cloudflared 등) 뒤에 있으면 TRUST_PROXY=1 설정
 // → X-Forwarded-For 기준으로 req.ip 판별
-if (process.env.TRUST_PROXY) app.set('trust proxy', true);
+// true 로 두면 XFF 맨 왼쪽(클라이언트가 마음대로 써 보낼 수 있는 값)을 믿는다.
+// 사설망 대역의 프록시만 믿고, 그 바깥에서 처음 만나는 주소를 접속자로 본다.
+if (process.env.TRUST_PROXY) app.set('trust proxy', 'loopback, uniquelocal');
 
 app.use(express.json());
 app.use(cookieSession({
