@@ -24,9 +24,16 @@ app.use(cookieSession({
 }));
 
 app.use('/api', api);
-// 관리 화면은 운영 콘솔로 일원화됐다(구글 로그인). 예전 화면은 views/admin.html 에 남아 있고
-// 이 줄을 되돌리면 그대로 살아난다.
-app.get('/admin', (req, res) => res.redirect(302, process.env.CONSOLE_URL || 'https://console.sofie.co.kr/'));
+// 관리 화면은 운영 콘솔로 일원화됐다(구글 로그인).
+// 옛 화면(views/admin.html)은 지우지 않았고 LEGACY_ADMIN=1 이면 그대로 살아난다.
+// 살아날 때도 예전과 똑같이 사설망 + 비밀번호(+OTP) 뒤에 있다.
+app.get('/admin', (req, res, next) => {
+    if (process.env.LEGACY_ADMIN === '1') {
+        return requireInternal(req, res, () =>
+            res.sendFile(path.join(__dirname, 'views', 'admin.html')));
+    }
+    res.redirect(302, process.env.CONSOLE_URL || 'https://console.sofie.co.kr/');
+});
 app.get('/project/:id(\\d+)', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'project.html')));
 app.get('/career/:id(\\d+)', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'career.html')));
 // 링크 태그 없이 직접 /favicon.ico 요청하는 클라이언트 대응
