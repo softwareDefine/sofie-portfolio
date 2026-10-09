@@ -1,0 +1,10 @@
+/* 나눔스퀘어 네오
+   네이버 배포 CSS(nanum-square-neo.css)는 굵기마다 패밀리명이 달라(NanumSquareNeoBold 등)
+   font-weight 로 굵기를 고를 수 없다. 한 패밀리('NanumSquare Neo')에 굵기별 파일을 묶어 직접 선언한다.
+   예전에 쓰던 URL "css/NanumSquare Neo.css" 는 404 라 폰트가 아예 안 먹고 있었다.
+   500 은 400, 600 은 700 파일로 그려진다 (브라우저 굵기 매칭 규칙). */
+@font-face { font-family: 'NanumSquare Neo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff) format('woff'); font-weight: 300; font-display: swap; }
+@font-face { font-family: 'NanumSquare Neo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff) format('woff'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'NanumSquare Neo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff) format('woff'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'NanumSquare Neo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff) format('woff'); font-weight: 800; font-display: swap; }
+@font-face { font-family: 'NanumSquare Neo'; src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff) format('woff'); font-weight: 900; font-display: swap; }
