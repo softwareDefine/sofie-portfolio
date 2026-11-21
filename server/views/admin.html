@@ -182,6 +182,7 @@ button{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-weight
                 <div class="field" style="margin:0"><label>전화번호</label><input type="text" id="a_phone"></div>
                 <div class="field" style="margin:0"><label>이메일</label><input type="text" id="a_email"></div>
             </div>
+            <div class="field" style="margin:0"><label>GitHub (https://github.com/아이디)</label><input type="text" id="a_github"></div>
             <div class="field" style="margin:0">
                 <label>약력 표 — 값은 여러 줄 가능, 링크는 [텍스트](URL)</label>
                 <div id="a_rows" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -632,6 +633,7 @@ function renderAboutAdmin(){
     document.getElementById('a_intro').value=settings.about_intro||'';
     document.getElementById('a_phone').value=settings.about_phone||'';
     document.getElementById('a_email').value=settings.about_email||'';
+    document.getElementById('a_github').value=settings.about_github||'';
     try{aboutRows=JSON.parse(settings.about_rows||'[]');}catch(e){aboutRows=[];}
     renderAboutRows();
 }
@@ -667,6 +669,7 @@ async function saveAbout(){
         about_intro:document.getElementById('a_intro').value.trim(),
         about_phone:document.getElementById('a_phone').value.trim(),
         about_email:document.getElementById('a_email').value.trim(),
+        about_github:document.getElementById('a_github').value.trim(),
         about_rows:JSON.stringify(aboutRows.filter(r=>r.label.trim()||String(r.value).trim())),
     };
     try{await api('/settings',{method:'PUT',body:JSON.stringify(body)});toast('저장됨');loadAll();}
