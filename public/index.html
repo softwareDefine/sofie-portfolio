@@ -106,6 +106,8 @@
             backface-visibility: hidden;
             transform-origin: 50% 50% -0.65em; /* 줄 높이(1.3em)의 절반 뒤 = 큐브 중심 */
         }
+        /* 모든 제목을 안 보이게 겹쳐 두어 칸 너비를 가장 긴 제목에 고정 → 바뀔 때 레이아웃이 안 흔들림 */
+        .hero-left h1 .face.ghost { visibility: hidden; }
         .hero-left h1 .face.out { animation: cubeOut .7s cubic-bezier(.6,0,.3,1) forwards; }
         .hero-left h1 .face.in  { animation: cubeIn  .7s cubic-bezier(.6,0,.3,1) forwards; }
         @keyframes cubeOut { from { transform: rotateX(0deg); }   to { transform: rotateX(90deg); } }
@@ -1109,12 +1111,24 @@ function setHeroTitle(text,animate){
     const cube=h.querySelector('.cube');
     const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(!cube||!animate||still){
-        h.innerHTML='<span class="cube"><span class="face"></span></span>';
-        h.querySelector('.face').textContent=text;
+        h.innerHTML='<span class="cube"></span>';
+        const c=h.firstChild;
+        heroTitles.forEach(t=>{
+            const g=document.createElement('span');
+            g.className='face ghost';
+            g.setAttribute('aria-hidden','true');
+            g.textContent=t;
+            c.appendChild(g);
+        });
+        const f=document.createElement('span');
+        f.className='face';
+        f.textContent=text;
+        c.appendChild(f);
         return;
     }
-    const old=cube.lastElementChild;
-    [...cube.children].forEach(f=>{if(f!==old)f.remove();}); // 전환이 겹치면 이전 잔상 정리
+    const live=[...cube.querySelectorAll('.face:not(.ghost)')];
+    const old=live[live.length-1];
+    live.forEach(f=>{if(f!==old)f.remove();}); // 전환이 겹치면 이전 잔상 정리
     const nf=document.createElement('span');
     nf.className='face in';
     nf.textContent=text;
