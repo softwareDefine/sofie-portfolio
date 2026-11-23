@@ -28,6 +28,8 @@ router.get('/content', async (req, res, next) => {
             stat_projects: String(projects.rows.length),
             stat_activities: String(careers.rows.length),
         };
+        // 관리자/콘솔에서 바꾼 내용이 새로고침 없이 바로 보이게: 매번 ETag 로 재검증 (안 바뀌었으면 304)
+        res.set('Cache-Control', 'no-cache');
         res.json({
             careers: careers.rows,
             projects: projects.rows,
