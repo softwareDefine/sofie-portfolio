@@ -96,9 +96,20 @@
             line-height: 1.3;
             letter-spacing: -0.01em;
             margin-bottom: 14px;
-            transition: opacity .4s ease;
+            perspective: 800px;
         }
-        .hero-left h1.swap { opacity: 0; }
+        /* 제목 큐브 전환: 지금 면이 위로 넘어가고 다음 면이 아래에서 올라온다 */
+        .hero-left h1 .cube { display: inline-grid; }
+        .hero-left h1 .face {
+            grid-area: 1 / 1;
+            white-space: nowrap;
+            backface-visibility: hidden;
+            transform-origin: 50% 50% -0.65em; /* 줄 높이(1.3em)의 절반 뒤 = 큐브 중심 */
+        }
+        .hero-left h1 .face.out { animation: cubeOut .7s cubic-bezier(.6,0,.3,1) forwards; }
+        .hero-left h1 .face.in  { animation: cubeIn  .7s cubic-bezier(.6,0,.3,1) forwards; }
+        @keyframes cubeOut { from { transform: rotateX(0deg); }   to { transform: rotateX(90deg); } }
+        @keyframes cubeIn  { from { transform: rotateX(-90deg); } to { transform: rotateX(0deg); } }
         .hero-left .desc {
             font-size: 0.92rem;
             color: #fff;
@@ -1093,18 +1104,35 @@ function renderStats(settings){
 
 // 히어로 제목: "SW 공학자 이주호|백엔드 개발자 이주호" 처럼 | 로 나누면 배경 영상이 바뀔 때마다 돌아간다
 let heroTitles=[], heroTi=0;
+function setHeroTitle(text,animate){
+    const h=document.getElementById('heroTitle');
+    const cube=h.querySelector('.cube');
+    const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(!cube||!animate||still){
+        h.innerHTML='<span class="cube"><span class="face"></span></span>';
+        h.querySelector('.face').textContent=text;
+        return;
+    }
+    const old=cube.lastElementChild;
+    [...cube.children].forEach(f=>{if(f!==old)f.remove();}); // 전환이 겹치면 이전 잔상 정리
+    const nf=document.createElement('span');
+    nf.className='face in';
+    nf.textContent=text;
+    cube.appendChild(nf);
+    old.classList.remove('in');
+    old.classList.add('out');
+    nf.addEventListener('animationend',()=>{old.remove();nf.classList.remove('in');},{once:true});
+}
 function nextHeroTitle(){
     if(heroTitles.length<2)return;
     heroTi=(heroTi+1)%heroTitles.length;
-    const h=document.getElementById('heroTitle');
-    h.classList.add('swap');
-    setTimeout(()=>{h.textContent=heroTitles[heroTi];h.classList.remove('swap');},400);
+    setHeroTitle(heroTitles[heroTi],true);
 }
 
 function renderHero(s){
     if(s.hero_title){
         heroTitles=String(s.hero_title).split('|').map(t=>t.trim()).filter(Boolean);
-        if(heroTitles.length)document.getElementById('heroTitle').textContent=heroTitles[0];
+        if(heroTitles.length)setHeroTitle(heroTitles[0],false);
     }
     if(s.hero_desc)document.getElementById('heroDesc').textContent=s.hero_desc;
     let clips=[];
